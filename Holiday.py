@@ -212,5 +212,5 @@ class jourferie:
       for i in xrange(0, len(F)):
           if j==F[i][0] and m==F[i][1] and a==F[i][2]:
               return L[i]
-      return ""    
+      return "no"    
 

@@ -5,7 +5,7 @@ define({ api: [
     "title": "Holiday Status Request",
     "name": "GetHoliday",
     "group": "Api.domogeek.fr",
-    "description": "Ask whether know if :date is a holiday",
+    "description": "Ask to know if :date is a holiday",
     "parameter": {
       "fields": {
         "Parameter": [
@@ -37,7 +37,7 @@ define({ api: [
       "examples": [
         {
           "title": "Success-Response:",
-          "content": "   HTTP/1.1 200 OK\n   Jour de Noel\n    HTTP/1.1 200 OK\n   (empty response if not holiday)\n"
+          "content": "   HTTP/1.1 200 OK\n   Jour de Noel\n    HTTP/1.1 200 OK\n   no\n"
         }
       ]
     },
