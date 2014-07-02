@@ -1,5 +1,10 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
+#
+# Gruik coded by GuiguiAbloc
+# http://blog.guiguiabloc.fr
+# http://api.domogeek.fr
+#
 
 import web, sys, time
 import json
@@ -10,12 +15,10 @@ import Holiday
 
 dayrequest = Holiday.jourferie()
 
-
 urls = (
   '/holiday/(.*)', 'holiday',
   '/', 'index'
 )
-
 
 app = web.application(urls, globals())
 
@@ -29,7 +32,7 @@ class index:
 @api {get} /holiday/:date Holiday Status Request
 @apiName GetHoliday
 @apiGroup Api.domogeek.fr
-@apiDescription Ask whether know if :date is a holiday
+@apiDescription Ask to know if :date is a holiday
 @apiParam {String} now  Ask for today.
 @apiParam {String} all  Ask for all entry.
 @apiParam {Datetime} D-M-YYYY  Ask for specific date.
@@ -38,7 +41,7 @@ class index:
      Jour de Noel
 
      HTTP/1.1 200 OK
-     (empty response if not holiday)
+     no
 
 @apiErrorExample Error-Response:
      HTTP/1.1 400 Bad Request
