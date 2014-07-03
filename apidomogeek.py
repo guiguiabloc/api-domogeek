@@ -34,7 +34,7 @@ class index:
 """
 @api {get} /holiday/:date Holiday Status Request
 @apiName GetHoliday
-@apiGroup Api.domogeek.fr
+@apiGroup Domogeek
 @apiDescription Ask to know if :date is a holiday
 @apiParam {String} now  Ask for today.
 @apiParam {String} all  Ask for all entry.
@@ -104,7 +104,7 @@ class holiday:
 """
 @api {get} /tempoedf/:date Tempo EDF color Request
 @apiName GetTempo
-@apiGroup Api.domogeek.fr
+@apiGroup Domogeek
 @apiDescription Ask the EDF Tempo color
 @apiParam {String} now  Ask for today.
 @apiParam {String} tomorrow Ask for tomorrow.

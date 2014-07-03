@@ -4,7 +4,7 @@
     "url": "/holiday/:date",
     "title": "Holiday Status Request",
     "name": "GetHoliday",
-    "group": "Api.domogeek.fr",
+    "group": "Domogeek",
     "description": "Ask to know if :date is a holiday",
     "parameter": {
       "fields": {
@@ -63,7 +63,7 @@
     "url": "/tempoedf/:date",
     "title": "Tempo EDF color Request",
     "name": "GetTempo",
-    "group": "Api.domogeek.fr",
+    "group": "Domogeek",
     "description": "Ask the EDF Tempo color",
     "parameter": {
       "fields": {
