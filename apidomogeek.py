@@ -12,11 +12,14 @@ from datetime import datetime
 import urllib, urllib2
 from Daemon import Daemon
 import Holiday
+import ClassTempo
 
 dayrequest = Holiday.jourferie()
+temporequest = ClassTempo.EDFTempo()
 
 urls = (
   '/holiday/(.*)', 'holiday',
+  '/tempoedf/(.*)', 'tempoedf',
   '/', 'index'
 )
 
@@ -98,6 +101,47 @@ class holiday:
         result = dayrequest.estferie([day,month,year])
         return result
 
+"""
+@api {get} /tempoedf/:date Tempo EDF color Request
+@apiName GetTempo
+@apiGroup Api.domogeek.fr
+@apiDescription Ask the EDF Tempo color
+@apiParam {String} now  Ask for today.
+@apiParam {String} tomorrow Ask for tomorrow.
+@apiSuccessExample Success-Response:
+HTTP/1.1 200 OK
+Content-Type: application/json
+Transfer-Encoding: chunked
+Date: Thu, 03 Jul 2014 17:16:47 GMT
+Server: localhost
+{"tempocolor": "bleu"}
+
+@apiErrorExample Error-Response:
+HTTP/1.1 400 Bad Request
+400 Bad Request
+
+@apiExample Example usage:
+     curl http://api.domogeek.fr/tempoedf/now
+     curl http://api.domogeek.fr/tempoedf/tomorrow
+
+"""
+
+class tempoedf:
+    def GET(self,uri):
+      request = uri.split('/')
+      if request == ['']:
+        web.badrequest()
+        return "Incorrect request : /tempoedf/{now | tomorrow}\n"
+      if request[0] == "now":
+        result = temporequest.TempoToday()
+        web.header('Content-Type', 'application/json')
+        return json.dumps({"tempocolor": result})
+      if request[0] == "tomorrow":
+        result = temporequest.TempoTomorrow()
+        web.header('Content-Type', 'application/json')
+        return json.dumps({"tempocolor": result})
+      web.badrequest()
+      return "Incorrect request : /tempoedf/{now | tomorrow}\n"
 
 class MyDaemon(Daemon):
         def run(self):
