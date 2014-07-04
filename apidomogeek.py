@@ -32,13 +32,14 @@ class index:
 
 
 """
-@api {get} /holiday/:date Holiday Status Request
+@api {get} /holiday/:date/:responsetype Holiday Status Request
 @apiName GetHoliday
 @apiGroup Domogeek
 @apiDescription Ask to know if :date is a holiday
 @apiParam {String} now  Ask for today.
 @apiParam {String} all  Ask for all entry.
 @apiParam {Datetime} D-M-YYYY  Ask for specific date.
+@apiParam {String} [responsetype]  Specify Response Type (raw by default or specify json, only for single element).
 @apiSuccessExample Success-Response:
      HTTP/1.1 200 OK
      Jour de Noel
@@ -52,8 +53,9 @@ class index:
 
 @apiExample Example usage:
      curl http://api.domogeek.fr/holiday/now
+     curl http://api.domogeek.fr/holiday/now/json
      curl http://api.domogeek.fr/holiday/all
-     curl http://api.domogeek.fr/holiday/25-12-2014
+     curl http://api.domogeek.fr/holiday/25-12-2014/json
 
 """
 
@@ -63,13 +65,21 @@ class holiday:
       if request == ['']:
         web.badrequest()
         return "Incorrect request : /holiday/{now / date(D-M-YYYY)}\n"
+      try:
+        format = request[1]
+      except:
+        format = None
       if request[0] == "now":
         datenow = datetime.now()
         year = datenow.year
         month = datenow.month
         day = datenow.day 
         result = dayrequest.estferie([day,month,year])
-        return result
+        if format == "json":
+          web.header('Content-Type', 'application/json')
+          return json.dumps({"holiday": result})
+        else:
+          return result
       if request[0] == "all":
         datenow = datetime.now()
         year = datenow.year
@@ -99,15 +109,20 @@ class holiday:
           web.badrequest()
           return "Incorrect date format : D-M-YYYY\n"
         result = dayrequest.estferie([day,month,year])
-        return result
+        if format == "json":
+          web.header('Content-Type', 'application/json')
+          return json.dumps({"holiday": result})
+        else:
+          return result
 
 """
-@api {get} /tempoedf/:date Tempo EDF color Request
+@api {get} /tempoedf/:date/:responsetype Tempo EDF color Request
 @apiName GetTempo
 @apiGroup Domogeek
 @apiDescription Ask the EDF Tempo color
 @apiParam {String} now  Ask for today.
 @apiParam {String} tomorrow Ask for tomorrow.
+@apiParam {String} [responsetype]  Specify Response Type (raw by default or specify json, only for single element).
 @apiSuccessExample Success-Response:
 HTTP/1.1 200 OK
 Content-Type: application/json
@@ -122,7 +137,9 @@ HTTP/1.1 400 Bad Request
 
 @apiExample Example usage:
      curl http://api.domogeek.fr/tempoedf/now
+     curl http://api.domogeek.fr/tempoedf/now/json
      curl http://api.domogeek.fr/tempoedf/tomorrow
+     curl http://api.domogeek.fr/tempoedf/tomorrow/json
 
 """
 
@@ -132,14 +149,24 @@ class tempoedf:
       if request == ['']:
         web.badrequest()
         return "Incorrect request : /tempoedf/{now | tomorrow}\n"
+      try:
+        format = request[1]
+      except:
+        format = None
       if request[0] == "now":
         result = temporequest.TempoToday()
-        web.header('Content-Type', 'application/json')
-        return json.dumps({"tempocolor": result})
+        if format == "json":
+          web.header('Content-Type', 'application/json')
+          return json.dumps({"tempocolor": result})
+        else:
+          return result
       if request[0] == "tomorrow":
         result = temporequest.TempoTomorrow()
-        web.header('Content-Type', 'application/json')
-        return json.dumps({"tempocolor": result})
+        if format == "json":
+          web.header('Content-Type', 'application/json')
+          return json.dumps({"tempocolor": result})
+        else:
+          return result
       web.badrequest()
       return "Incorrect request : /tempoedf/{now | tomorrow}\n"
 
