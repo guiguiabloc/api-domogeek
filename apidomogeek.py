@@ -8,7 +8,7 @@
 
 import web, sys, time
 import json
-from datetime import datetime
+from datetime import datetime,date,timedelta
 import urllib, urllib2
 from Daemon import Daemon
 import Holiday
@@ -23,6 +23,7 @@ urls = (
   '/holiday/(.*)', 'holiday',
   '/tempoedf/(.*)', 'tempoedf',
   '/schoolholiday/(.*)', 'schoolholiday',
+  '/weekend/(.*)', 'weekend',
   '/', 'index'
 )
 
@@ -117,6 +118,95 @@ class holiday:
           return json.dumps({"holiday": result})
         else:
           return result
+
+
+"""
+@api {get} /weekend/:daterequest/:responsetype Week-end Status Request
+@apiName GetWeekend
+@apiGroup Domogeek
+@apiDescription Ask to know if :daterequest is a week-end day
+@apiParam {String} daterequest Ask for specific date {now | tomorrow | D-M-YYYY}.
+@apiParam {String} [responsetype]  Specify Response Type (raw by default or specify json, only for single element).
+@apiSuccessExample Success-Response:
+     HTTP/1.1 200 OK
+     True
+
+     HTTP/1.1 200 OK
+     False
+
+@apiErrorExample Error-Response:
+     HTTP/1.1 400 Bad Request
+     400 Bad Request
+
+@apiExample Example usage:
+     curl http://api.domogeek.fr/weekend/now
+     curl http://api.domogeek.fr/weekend/tomorrow
+     curl http://api.domogeek.fr/weekend/now/json
+     curl http://api.domogeek.fr/weekend/16-07-2014/json
+
+"""
+class weekend:
+    def GET(self,uri):
+      request = uri.split('/')
+      if request == ['']:
+        web.badrequest()
+        return "Incorrect request : /weekend/{now|tomorrow|date(D-M-YYYY)}\n"
+      try:
+        format = request[1]
+      except:
+        format = None
+      if request[0] == "now":
+        datenow = datetime.now()
+        daynow = datetime.now().weekday()
+        day = datenow.day
+        if day == "5" or day == "6":
+          result = "True"
+        else:
+          result = "False"
+        if format == "json":
+          web.header('Content-Type', 'application/json')
+          return json.dumps({"weekend": result})
+        else:
+          return result
+      if request[0] == "tomorrow":
+        today = date.today()
+        datetomorrow = today + timedelta(days=1)
+        day = datetomorrow.weekday()
+        if day == 5 or day == 6:
+          result = "True"
+        else:
+          result = "False"
+        if format == "json":
+          web.header('Content-Type', 'application/json')
+          return json.dumps({"weekend": result})
+        else:
+          return result
+      if request[0] != "now" and request[0] != "tomorrow":
+        try:
+          daterequest = request[0]
+          day,month,year = daterequest.split('-')
+        except:
+          web.badrequest()
+          return "Incorrect date format : D-M-YYYY\n"
+        try:
+          int(day)
+          int(month)
+          int(year)
+        except:
+          web.badrequest()
+          return "Incorrect date format : D-M-YYYY\n"
+        requestday = date(int(year),int(month),int(day)).weekday()
+        print requestday
+        if requestday == 5 or requestday == 6:
+          result = "True"
+        else:
+          result = "False"
+        if format == "json":
+          web.header('Content-Type', 'application/json')
+          return json.dumps({"weekend": result})
+        else:
+          return result
+
 
 """
 @api {get} /tempoedf/:date/:responsetype Tempo EDF color Request
