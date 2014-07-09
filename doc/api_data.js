@@ -182,5 +182,57 @@ define({ api: [
     ],
     "version": "0.0.0",
     "filename": "./apidomogeek.py"
+  },
+  {
+    "type": "get",
+    "url": "/weekend/:daterequest/:responsetype",
+    "title": "Week-end Status Request",
+    "name": "GetWeekend",
+    "group": "Domogeek",
+    "description": "Ask to know if :daterequest is a week-end day",
+    "parameter": {
+      "fields": {
+        "Parameter": [
+          {
+            "group": "Parameter",
+            "type": "String",
+            "field": "daterequest",
+            "optional": false,
+            "description": "Ask for specific date {now | tomorrow | D-M-YYYY}."
+          },
+          {
+            "group": "Parameter",
+            "type": "String",
+            "field": "responsetype",
+            "optional": true,
+            "description": "Specify Response Type (raw by default or specify json, only for single element)."
+          }
+        ]
+      }
+    },
+    "success": {
+      "examples": [
+        {
+          "title": "Success-Response:",
+          "content": "   HTTP/1.1 200 OK\n   True\n    HTTP/1.1 200 OK\n   False\n"
+        }
+      ]
+    },
+    "error": {
+      "examples": [
+        {
+          "title": "Error-Response:",
+          "content": "   HTTP/1.1 400 Bad Request\n   400 Bad Request\n"
+        }
+      ]
+    },
+    "examples": [
+      {
+        "title": "Example usage:",
+        "content": "   curl http://api.domogeek.fr/weekend/now\n   curl http://api.domogeek.fr/weekend/tomorrow\n   curl http://api.domogeek.fr/weekend/now/json\n   curl http://api.domogeek.fr/weekend/16-07-2014/json\n"
+      }
+    ],
+    "version": "0.0.0",
+    "filename": "./apidomogeek.py"
   }
 ] });
