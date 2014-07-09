@@ -19,11 +19,23 @@ school = ClassSchoolCalendar.schoolcalendar()
 dayrequest = Holiday.jourferie()
 temporequest = ClassTempo.EDFTempo()
 
+##########
+# CONFIG #
+##########
+
+localapiurl= "http://api.domogeek.fr"
+
+##############
+# END CONFIG #
+##############
+
+
 urls = (
   '/holiday/(.*)', 'holiday',
   '/tempoedf/(.*)', 'tempoedf',
   '/schoolholiday/(.*)', 'schoolholiday',
   '/weekend/(.*)', 'weekend',
+  '/holidayall/(.*)', 'holidayall',
   '/', 'index'
 )
 
@@ -196,7 +208,6 @@ class weekend:
           web.badrequest()
           return "Incorrect date format : D-M-YYYY\n"
         requestday = date(int(year),int(month),int(day)).weekday()
-        print requestday
         if requestday == 5 or requestday == 6:
           result = "True"
         else:
@@ -206,6 +217,80 @@ class weekend:
           return json.dumps({"weekend": result})
         else:
           return result
+
+"""
+@api {get} /holidayall/:zone/:daterequest All Holidays Status Request (json return)
+@apiName GetHolidayall
+@apiGroup Domogeek
+@apiDescription Ask to know if :daterequest is a holiday, school holiday and week-end day
+@apiParam {String} zone  School Zone (A, B or C).
+@apiParam {String} daterequest Ask for specific date {now | D-M-YYYY}.
+@apiSuccessExample Success-Response:
+     HTTP/1.1 200 OK
+     {"holiday": "False", "weekend": "False", "schoolholiday": "Vacances de printemps - Zone A"}
+
+
+@apiErrorExample Error-Response:
+     HTTP/1.1 400 Bad Request
+     400 Bad Request
+
+@apiExample Example usage:
+     curl http://api.domogeek.fr/holidayall/A/now
+     curl http://api.domogeek.fr/holidayall/B/25-02-2014
+"""
+class holidayall:
+    def GET(self,uri):
+      request = uri.split('/')
+      if request == ['']:
+        web.badrequest()
+        return "Incorrect request : /holidayall/{zone}/{now|date(D-M-YYYY)}\n"
+      try:
+        zone = request[0]
+      except:
+        return "Incorrect request : /holidayall/{zone}/{now|date(D-M-YYYY)}\n"
+      try:
+        zoneok = str(zone.upper())
+      except:
+        return "Wrong Zone (must be A, B or C)"
+      if len(zoneok) > 1:
+        return "Wrong Zone (must be A, B or C)"
+      if zoneok not in ["A","B","C"]:
+        return "Incorrect request : /holidayall/{zone}/{now|date(D-M-YYYY)}\n"
+      try:
+        daterequest = request[1]
+      except:
+        return "Incorrect request : /holidayall/{zone}/{now|date(D-M-YYYY)}\n"
+      if request[1] == "now":
+        responseholiday = urllib2.urlopen(localapiurl+'/holiday/now')
+        responseschoolholiday = urllib2.urlopen(localapiurl+'/schoolholiday/'+zoneok+'/now')
+        responseweekend = urllib2.urlopen(localapiurl+'/weekend/now')
+        resultholiday = responseholiday.read()
+        resultschoolholiday = responseschoolholiday.read()
+        resultweekend = responseweekend.read()
+        web.header('Content-Type', 'application/json')
+        return json.dumps({"holiday": resultholiday, "schoolholiday": resultschoolholiday, "weekend": resultweekend})
+      if request[1] != "now":
+        try:
+          daterequest = request[1]
+          day,month,year = daterequest.split('-')
+        except:
+          web.badrequest()
+          return "Incorrect date format : D-M-YYYY\n"
+        try:
+          int(day)
+          int(month)
+          int(year)
+        except:
+          web.badrequest()
+          return "Incorrect date format : D-M-YYYY\n"
+        responseholiday = urllib2.urlopen(localapiurl+'/holiday/'+daterequest)
+        responseschoolholiday = urllib2.urlopen(localapiurl+'/schoolholiday/'+zoneok+'/'+daterequest)
+        responseweekend = urllib2.urlopen(localapiurl+'/weekend/'+daterequest)
+        resultholiday = responseholiday.read()
+        resultschoolholiday = responseschoolholiday.read()
+        resultweekend = responseweekend.read()
+        web.header('Content-Type', 'application/json')
+        return json.dumps({"holiday": resultholiday, "schoolholiday": resultschoolholiday, "weekend": resultweekend})
 
 
 """
