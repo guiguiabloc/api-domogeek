@@ -266,9 +266,10 @@ class holidayall:
         responseweekend = urllib2.urlopen(localapiurl+'/weekend/now')
         resultholiday = responseholiday.read()
         resultschoolholiday = responseschoolholiday.read()
+        resultschoolholidays = resultschoolholiday.decode('utf-8')
         resultweekend = responseweekend.read()
         web.header('Content-Type', 'application/json')
-        return json.dumps({"holiday": resultholiday, "schoolholiday": resultschoolholiday, "weekend": resultweekend})
+        return json.dumps({"holiday": resultholiday, "schoolholiday": resultschoolholidays, "weekend": resultweekend}, ensure_ascii=False).encode('utf8')
       if request[1] != "now":
         try:
           daterequest = request[1]
@@ -288,9 +289,10 @@ class holidayall:
         responseweekend = urllib2.urlopen(localapiurl+'/weekend/'+daterequest)
         resultholiday = responseholiday.read()
         resultschoolholiday = responseschoolholiday.read()
+        resultschoolholidays = resultschoolholiday.decode('utf-8')
         resultweekend = responseweekend.read()
         web.header('Content-Type', 'application/json')
-        return json.dumps({"holiday": resultholiday, "schoolholiday": resultschoolholiday, "weekend": resultweekend})
+        return json.dumps({"holiday": resultholiday, "schoolholiday": resultschoolholidays, "weekend": resultweekend}, ensure_ascii=False).encode('utf8')
 
 
 """
