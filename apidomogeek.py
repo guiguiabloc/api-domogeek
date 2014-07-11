@@ -14,10 +14,12 @@ from Daemon import Daemon
 import Holiday
 import ClassTempo
 import ClassSchoolCalendar
+import ClassVigilance
 
 school = ClassSchoolCalendar.schoolcalendar()
 dayrequest = Holiday.jourferie()
 temporequest = ClassTempo.EDFTempo()
+vigilancerequest = ClassVigilance.vigilance()
 
 ##########
 # CONFIG #
@@ -36,6 +38,7 @@ urls = (
   '/schoolholiday/(.*)', 'schoolholiday',
   '/weekend/(.*)', 'weekend',
   '/holidayall/(.*)', 'holidayall',
+  '/vigilance/(.*)', 'vigilance',
   '/', 'index'
 )
 
@@ -461,6 +464,46 @@ class schoolholiday:
           return description
 
 
+"""
+@api {get} /vigilance/:department/:responsetype Vigilance MeteoFrance Color
+@apiName GetVigilance
+@apiGroup Domogeek
+@apiDescription Ask Vigilance color for :department
+@apiParam {String} department Department number (France Metropolitan).
+@apiParam {String} [responsetype]  Specify Response Type (raw by default or specify json, only for single element).
+@apiSuccessExample Success-Response:
+     HTTP/1.1 200 OK
+     vert
+
+@apiErrorExample Error-Response:
+     HTTP/1.1 400 Bad Request
+     400 Bad Request
+
+@apiExample Example usage:
+     curl http://api.domogeek.fr/vigilance/29
+     curl http://api.domogeek.fr/vigilance/29/json
+
+"""
+class vigilance:
+    def GET(self,uri):
+      request = uri.split('/')
+      if request == ['']:
+        web.badrequest()
+        return "Incorrect request : /vigilance/{department}\n"
+      try:
+        dep = request[0]
+      except:
+        return "Incorrect request : /vigilance/{department}\n"
+      try:
+        format = request[1]
+      except:
+        format = None
+      result = vigilancerequest.getvigilance(dep)
+      if format == "json":
+          web.header('Content-Type', 'application/json')
+          return json.dumps({"vigilance": result})
+      else:
+          return result
 
 
 class MyDaemon(Daemon):
