@@ -222,7 +222,7 @@ class weekend:
           return result
 
 """
-@api {get} /holidayall/:zone/:daterequest All Holidays Status Request (json return)
+@api {get} /holidayall/:zone/:daterequest All Holidays Status Request
 @apiName GetHolidayall
 @apiGroup Domogeek
 @apiDescription Ask to know if :daterequest is a holiday, school holiday and week-end day
