@@ -21,6 +21,8 @@ class vigilance:
       if number == "2":
        return "jaune"
       if number == "3":
+       return "orange"
+      if number == "4":
        return "rouge"
     for all in parsexml :
       depart = all.attributes['dep'].value
