@@ -11,21 +11,29 @@ import json
 from datetime import datetime,date,timedelta
 import urllib, urllib2
 from Daemon import Daemon
+from xml.dom.minidom import parseString
 import Holiday
 import ClassTempo
 import ClassSchoolCalendar
 import ClassVigilance
+import ClassGeoLocation
 
 school = ClassSchoolCalendar.schoolcalendar()
 dayrequest = Holiday.jourferie()
 temporequest = ClassTempo.EDFTempo()
 vigilancerequest = ClassVigilance.vigilance()
+geolocationrequest = ClassGeoLocation.geolocation()
 
 ##########
 # CONFIG #
 ##########
 
 localapiurl= "http://api.domogeek.fr"
+listenip = "0.0.0.0"
+listenport = "80"
+googleapikey = ''
+bingmapapikey = ''
+geonameskey = ''
 
 ##############
 # END CONFIG #
@@ -39,6 +47,7 @@ urls = (
   '/weekend/(.*)', 'weekend',
   '/holidayall/(.*)', 'holidayall',
   '/vigilance/(.*)', 'vigilance',
+  '/geolocation/(.*)', 'geolocation',
   '/', 'index'
 )
 
@@ -174,7 +183,7 @@ class weekend:
         datenow = datetime.now()
         daynow = datetime.now().weekday()
         day = datenow.day
-        if day == "5" or day == "6":
+        if daynow == 5 or daynow == 6:
           result = "True"
         else:
           result = "False"
@@ -506,6 +515,88 @@ class vigilance:
           return result
 
 
+"""
+@api {get} /geolocation/:city City Geolocation 
+@apiName GetGeolocation
+@apiGroup Domogeek
+@apiDescription Ask geolocation (latitude/longitude) :city
+@apiParam {String} city City name (avoid accents, no guarantee works other than France Metropolitan).
+@apiSuccessExample Success-Response:
+     HTTP/1.1 200 OK
+     {"latitude": 48.390394000000001, "longitude": -4.4860759999999997}
+
+@apiErrorExample Error-Response:
+     HTTP/1.1 400 Bad Request
+     400 Bad Request
+
+@apiExample Example usage:
+     curl http://api.domogeek.fr/geolocation/brest
+"""
+class geolocation:
+    def GET(self,uri):
+      checkgoogle = False
+      checkbing = False
+      checkgeonames = False
+      request = uri.split('/')
+      if request == ['']:
+        web.badrequest()
+        return "Incorrect request : /geolocation/{city}\n"
+      try:
+        city = request[0]
+      except:
+        return "Incorrect request : /geolocation/{city}\n"
+      if googleapikey == '':
+        pass
+      else:
+        try:
+          data = geolocationrequest.geogoogle(city, googleapikey)
+          checkgoogle = True
+          web.header('Content-Type', 'application/json')
+          return json.dumps({"latitude": data[0], "longitude": data[1]})
+        except:
+          print "NO VALUE FROM GOOGLE"
+
+      if bingmapapikey == '':
+        pass
+      else:
+        if checkgoogle:
+          pass
+        else:
+          try:
+            data = geolocationrequest.geobing(city, bingmapapikey)
+          except:
+            print "NO VALUE FROM BING"
+            data = False
+          if not data :
+            print "NO BING"
+          else:
+            checkbing = True
+            web.header('Content-Type', 'application/json')
+            return json.dumps({"latitude": data[0], "longitude": data[1]})
+
+      if geonameskey == '':
+        pass
+      else:
+        if checkbing:
+          pass
+        else:
+          try:
+            data = geolocationrequest.geonames(city, geonameskey)
+          except:
+            print "NO VALUE FROM GEONAMES"
+            data = False
+          if not data :
+            print "NO VALUE FROM GEONAMES"
+          else:
+            checkgeonames = True
+            web.header('Content-Type', 'application/json')
+            return json.dumps({"latitude": data[0], "longitude": data[1]})
+
+      if not checkgoogle and not checkbing and not checkgeonames:
+         return "NO GEOLOCATION DATA AVAILABLE\n"
+
+
+
 class MyDaemon(Daemon):
         def run(self):
           app.run()
@@ -515,14 +606,14 @@ if __name__ == "__main__":
         service = MyDaemon('/tmp/apidomogeek.pid')
         if len(sys.argv) == 2:
                 if 'start' == sys.argv[1]:
-                        sys.argv[1] =  '80'
+                        sys.argv[1] =  listenip+':'+listenport
                         service.start()
                 elif 'stop' == sys.argv[1]:
                         service.stop()
                 elif 'restart' == sys.argv[1]:
                         service.restart()
                 elif 'console' == sys.argv[1]:
-                        sys.argv[1] =  '80'
+                        sys.argv[1] =  listenip+':'+listenport
                         service.console()
 
                 else:

@@ -9,3 +9,10 @@ ipaddr https://pypi.python.org/simple/ipaddr/
 MaxMind GeoLite2 DB http://dev.maxmind.com/geoip/geoip2/geolite2/
 MaxMind GeoIP2 API https://pypi.python.org/pypi/geoip2
 
+Geolocation Function need :
+Google API Key : https://developers.google.com/maps/documentation/geocoding/#api_key
+and/or
+Bing Maps Key : http://msdn.microsoft.com/en-us/library/ff428642.aspx
+and/or
+GeoNames Key : http://www.geonames.org/export/web-services.html
+
