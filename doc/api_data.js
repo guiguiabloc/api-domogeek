@@ -223,6 +223,72 @@ define({ api: [
   },
   {
     "type": "get",
+    "url": "/sun/:city/:sunrequest/:date/:responsetype",
+    "title": "Sun Status Request",
+    "name": "GetSun",
+    "group": "Domogeek",
+    "description": "Ask to know sunrise, sunset, zenith, day duration for :date in :city (France)",
+    "parameter": {
+      "fields": {
+        "Parameter": [
+          {
+            "group": "Parameter",
+            "type": "String",
+            "field": "city",
+            "optional": false,
+            "description": "City name (avoid accents, France Metropolitan)."
+          },
+          {
+            "group": "Parameter",
+            "type": "String",
+            "field": "sunrequest",
+            "optional": false,
+            "description": "Ask for {sunrise | sunset | zenith | dayduration | all}."
+          },
+          {
+            "group": "Parameter",
+            "type": "String",
+            "field": "date",
+            "optional": false,
+            "description": "Date request {now | tomorrow}."
+          },
+          {
+            "group": "Parameter",
+            "type": "String",
+            "field": "responsetype",
+            "optional": true,
+            "description": "Specify Response Type (raw by default or specify json, only for single element)."
+          }
+        ]
+      }
+    },
+    "success": {
+      "examples": [
+        {
+          "title": "Success-Response:",
+          "content": "   HTTP/1.1 200 OK\n   {\"sunset\": \"20:59\"}\n    HTTP/1.1 200 OK\n   {\"dayduration\": \"15:06\", \"sunset\": \"21:18\", \"zenith\": \"13:44\", \"sunrise\": \"6:11\"}\n"
+        }
+      ]
+    },
+    "error": {
+      "examples": [
+        {
+          "title": "Error-Response:",
+          "content": "   HTTP/1.1 400 Bad Request\n   400 Bad Request\n"
+        }
+      ]
+    },
+    "examples": [
+      {
+        "title": "Example usage:",
+        "content": "   curl http://api.domogeek.fr/sun/brest/all/now\n   curl http://api.domogeek.fr/sun/bastia/sunset/now/json\n   curl http://api.domogeek.fr/sun/strasbourg/sunrise/tomorrow\n"
+      }
+    ],
+    "version": "0.0.0",
+    "filename": "./apidomogeek.py"
+  },
+  {
+    "type": "get",
     "url": "/tempoedf/:date/:responsetype",
     "title": "Tempo EDF color Request",
     "name": "GetTempo",
