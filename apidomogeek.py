@@ -8,6 +8,7 @@
 
 import web, sys, time
 import json
+import time
 from datetime import datetime,date,timedelta
 import urllib, urllib2
 from Daemon import Daemon
@@ -17,20 +18,22 @@ import ClassTempo
 import ClassSchoolCalendar
 import ClassVigilance
 import ClassGeoLocation
+import ClassDawnDusk
 
 school = ClassSchoolCalendar.schoolcalendar()
 dayrequest = Holiday.jourferie()
 temporequest = ClassTempo.EDFTempo()
 vigilancerequest = ClassVigilance.vigilance()
 geolocationrequest = ClassGeoLocation.geolocation()
+dawnduskrequest = ClassDawnDusk.sunriseClass()
 
 ##########
 # CONFIG #
 ##########
 
-localapiurl= "http://api.domogeek.fr"
 listenip = "0.0.0.0"
 listenport = "80"
+localapiurl= "http://api.domogeek.fr"
 googleapikey = ''
 bingmapapikey = ''
 geonameskey = ''
@@ -38,6 +41,8 @@ geonameskey = ''
 ##############
 # END CONFIG #
 ##############
+
+web.config.debug = False
 
 
 urls = (
@@ -48,6 +53,7 @@ urls = (
   '/holidayall/(.*)', 'holidayall',
   '/vigilance/(.*)', 'vigilance',
   '/geolocation/(.*)', 'geolocation',
+  '/sun/(.*)', 'dawndusk',
   '/', 'index'
 )
 
@@ -595,6 +601,131 @@ class geolocation:
       if not checkgoogle and not checkbing and not checkgeonames:
          return "NO GEOLOCATION DATA AVAILABLE\n"
 
+"""
+@api {get} /sun/:city/:sunrequest/:date/:responsetype Sun Status Request 
+@apiName GetSun
+@apiGroup Domogeek
+@apiDescription Ask to know sunrise, sunset, zenith, day duration for :date in :city (France)
+@apiParam {String} city City name (avoid accents, France Metropolitan).
+@apiParam {String} sunrequest  Ask for {sunrise | sunset | zenith | dayduration | all}.
+@apiParam {String} date  Date request {now | tomorrow}.
+@apiParam {String} [responsetype]  Specify Response Type (raw by default or specify json, only for single element).
+@apiSuccessExample Success-Response:
+     HTTP/1.1 200 OK
+     {"sunset": "20:59"}
+
+     HTTP/1.1 200 OK
+     {"dayduration": "15:06", "sunset": "21:18", "zenith": "13:44", "sunrise": "6:11"}
+
+@apiErrorExample Error-Response:
+     HTTP/1.1 400 Bad Request
+     400 Bad Request
+
+@apiExample Example usage:
+     curl http://api.domogeek.fr/sun/brest/all/now
+     curl http://api.domogeek.fr/sun/bastia/sunset/now/json
+     curl http://api.domogeek.fr/sun/strasbourg/sunrise/tomorrow
+
+"""
+class dawndusk:
+    def GET(self,uri):
+      getutc = float(time.strftime("%z")[:3])
+      request = uri.split('/')
+      if request == ['']:
+        web.badrequest()
+        return "Incorrect request : /sun/city/{sunrise|sunset|zenith|dayduration|all}/{now|tomorrow}\n"
+      try:
+        city = request[0]
+      except:
+        return "Incorrect request : /sun/city/{sunrise|sunset|zenith|dayduration|all}/{now|tomorrow}\n"
+      try:
+        dawnduskrequestelement = request[1]
+      except:
+        return "Incorrect request : /sun/city/{sunrise|sunset|zenith|dayduration|all}/{now|tomorrow}\n"
+      try:
+        daterequest = request[2]
+      except:
+       return "Incorrect request : /sun/city/{sunrise|sunset|zenith|dayduration|all}/{now|tomorrow}\n"
+      try:
+        format = request[3]
+      except:
+        format = None
+      if dawnduskrequestelement not in ["sunrise", "sunset", "zenith", "dayduration", "all"]:
+        return "Incorrect request : /sun/city/{sunrise|sunset|zenith|dayduration|all}/{now|tomorrow}\n"
+      responsegeolocation = urllib2.urlopen(localapiurl+'/geolocation/'+city)
+      resultgeolocation = json.load(responsegeolocation)
+      try:
+        latitude =  resultgeolocation["latitude"]
+        longitude =  resultgeolocation["longitude"]
+      except:
+        return "NO GEOLOCATION DATA AVAILABLE\n"
+      if request[2] == "now":
+        today=date.today()
+      elif request[2] == "tomorrow":
+        today = date.today() + timedelta(days=1)
+      else:
+        return "Incorrect request : /sun/city/{sunrise|sunset|zenith|dayduration|all}/{now|tomorrow}\n"
+      dawnduskrequest.setNumericalDate(today.day,today.month,today.year)
+      dawnduskrequest.setLocation(latitude, longitude)
+      dawnduskrequest.calculateWithUTC(getutc)
+      sunrise = dawnduskrequest.sunriseTime
+      zenith = dawnduskrequest.meridianTime
+      sunset = dawnduskrequest.sunsetTime
+      dayduration =dawnduskrequest.durationTime
+      if request[2] == "now" and dawnduskrequestelement == "all" :
+          web.header('Content-Type', 'application/json')
+          return json.dumps({"sunrise": sunrise, "zenith": zenith, "sunset": sunset, "dayduration": dayduration})
+      if request[2] == "now" and dawnduskrequestelement == "sunrise" :
+          if format == "json":
+            web.header('Content-Type', 'application/json')
+            return json.dumps({"sunrise": sunrise})
+          else:
+            return sunrise
+      if request[2] == "now" and dawnduskrequestelement == "sunset" :
+          if format == "json":
+            web.header('Content-Type', 'application/json')
+            return json.dumps({"sunset": sunset})
+          else:
+            return sunset
+      if request[2] == "now" and dawnduskrequestelement == "zenith" :
+          if format == "json":
+            web.header('Content-Type', 'application/json')
+            return json.dumps({"zenith": zenith})
+          else:
+            return zenith
+      if request[2] == "now" and dawnduskrequestelement == "dayduration" :
+          if format == "json":
+            web.header('Content-Type', 'application/json')
+            return json.dumps({"dayduration": dayduration})
+          else:
+            return dayduration
+      if request[2] == "tomorrow" and dawnduskrequestelement == "all" :
+          web.header('Content-Type', 'application/json')
+          return json.dumps({"sunrise": sunrise, "zenith": zenith, "sunset": sunset, "dayduration": dayduration})
+      if request[2] == "now" and dawnduskrequestelement == "sunrise" :
+          if format == "json":
+            web.header('Content-Type', 'application/json')
+            return json.dumps({"sunrise": sunrise})
+          else:
+            return sunrise
+      if request[2] == "tomorrow" and dawnduskrequestelement == "sunset" :
+          if format == "json":
+            web.header('Content-Type', 'application/json')
+            return json.dumps({"sunset": sunset})
+          else:
+            return sunset
+      if request[2] == "tomorrow" and dawnduskrequestelement == "zenith" :
+          if format == "json":
+            web.header('Content-Type', 'application/json')
+            return json.dumps({"zenith": zenith})
+          else:
+            return zenith
+      if request[2] == "tomorrow" and dawnduskrequestelement == "dayduration" :
+          if format == "json":
+            web.header('Content-Type', 'application/json')
+            return json.dumps({"dayduration": dayduration})
+          else:
+            return dayduration
 
 
 class MyDaemon(Daemon):
