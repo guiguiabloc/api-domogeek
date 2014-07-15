@@ -1,13 +1,13 @@
 Python >= 2.6.7
+REDIS Server http://redis.io/
+
 
 web.py http://webpy.org/
 BeautifulSoup  http://www.crummy.com/software/BeautifulSoup/
 iCalendar https://pypi.python.org/pypi/icalendar
 requests https://pypi.python.org/simple/requests/
-maxminddb https://pypi.python.org/simple/maxminddb/
-ipaddr https://pypi.python.org/simple/ipaddr/
-MaxMind GeoLite2 DB http://dev.maxmind.com/geoip/geoip2/geolite2/
-MaxMind GeoIP2 API https://pypi.python.org/pypi/geoip2
+redis https://pypi.python.org/pypi/redis/
+
 
 Geolocation Function need :
 Google API Key : https://developers.google.com/maps/documentation/geocoding/#api_key

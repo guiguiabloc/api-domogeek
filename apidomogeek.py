@@ -7,7 +7,7 @@
 #
 
 import web, sys, time
-import json
+import json,hashlib
 import time
 from datetime import datetime,date,timedelta
 import urllib, urllib2
@@ -38,9 +38,29 @@ googleapikey = ''
 bingmapapikey = ''
 geonameskey = ''
 
+redis_host =  "127.0.0.1"
+redis_port =  6379
+
 ##############
 # END CONFIG #
 ##############
+
+##############
+# Test REDIS #
+##############
+try:
+ import redis
+except:
+  print "No Redis module : https://pypi.python.org/pypi/redis/"
+  sys.exit(1)
+
+rc= redis.Redis(host=redis_host, port=redis_port)
+rc.set("test", "ok")
+rc.expire("test" ,10)
+value = rc.get("test")
+if value is None:
+  print "Could not connect to  Redis  " + redis_host + " port " + redis_port
+
 
 web.config.debug = False
 
@@ -543,6 +563,7 @@ class geolocation:
       checkgoogle = False
       checkbing = False
       checkgeonames = False
+      inredis = False
       request = uri.split('/')
       if request == ['']:
         web.badrequest()
@@ -551,18 +572,37 @@ class geolocation:
         city = request[0]
       except:
         return "Incorrect request : /geolocation/{city}\n"
-      if googleapikey == '':
+      try:
+        rediskey =  hashlib.md5(city).hexdigest()
+        getlocation = rc.get(rediskey)
+        if getlocation is None:
+          pass
+        else:
+          print "FOUND LOCATION IN REDIS !!!"
+          inredis = "ok"
+          tr1 =  getlocation.replace("(","")
+          tr2 = tr1.replace(")","")
+          data = tr2.split(',')
+          web.header('Content-Type', 'application/json')
+          return json.dumps({"latitude": float(data[0]), "longitude": float(data[1])})
+
+      except:
+        pass
+
+      if googleapikey == '' or inredis == "ok":
         pass
       else:
         try:
           data = geolocationrequest.geogoogle(city, googleapikey)
           checkgoogle = True
+          rediskey =  hashlib.md5(city).hexdigest()
+          rc.set(rediskey, (data[0], data[1]))
           web.header('Content-Type', 'application/json')
           return json.dumps({"latitude": data[0], "longitude": data[1]})
         except:
           print "NO VALUE FROM GOOGLE"
 
-      if bingmapapikey == '':
+      if bingmapapikey == '' or inredis == "ok":
         pass
       else:
         if checkgoogle:
@@ -577,10 +617,12 @@ class geolocation:
             print "NO BING"
           else:
             checkbing = True
+            rediskey =  hashlib.md5(city).hexdigest()
+            rc.set(rediskey, (data[0], data[1]))
             web.header('Content-Type', 'application/json')
             return json.dumps({"latitude": data[0], "longitude": data[1]})
 
-      if geonameskey == '':
+      if geonameskey == '' or inredis == "ok":
         pass
       else:
         if checkbing:
@@ -595,10 +637,12 @@ class geolocation:
             print "NO VALUE FROM GEONAMES"
           else:
             checkgeonames = True
+            rediskey =  hashlib.md5(city).hexdigest()
+            rc.set(rediskey, (data[0], data[1]))
             web.header('Content-Type', 'application/json')
             return json.dumps({"latitude": data[0], "longitude": data[1]})
 
-      if not checkgoogle and not checkbing and not checkgeonames:
+      if not checkgoogle and not checkbing and not checkgeonames and not inredis:
          return "NO GEOLOCATION DATA AVAILABLE\n"
 
 """
