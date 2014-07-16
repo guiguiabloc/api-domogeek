@@ -546,7 +546,7 @@ class vigilance:
 @apiName GetGeolocation
 @apiGroup Domogeek
 @apiDescription Ask geolocation (latitude/longitude) :city
-@apiParam {String} city City name (avoid accents, no guarantee works other than France Metropolitan).
+@apiParam {String} city City name (avoid accents, no space, no guarantee works other than France Metropolitan).
 @apiSuccessExample Success-Response:
      HTTP/1.1 200 OK
      {"latitude": 48.390394000000001, "longitude": -4.4860759999999997}
@@ -650,7 +650,7 @@ class geolocation:
 @apiName GetSun
 @apiGroup Domogeek
 @apiDescription Ask to know sunrise, sunset, zenith, day duration for :date in :city (France)
-@apiParam {String} city City name (avoid accents, France Metropolitan).
+@apiParam {String} city City name (avoid accents, no space, France Metropolitan).
 @apiParam {String} sunrequest  Ask for {sunrise | sunset | zenith | dayduration | all}.
 @apiParam {String} date  Date request {now | tomorrow}.
 @apiParam {String} [responsetype]  Specify Response Type (raw by default or specify json, only for single element).

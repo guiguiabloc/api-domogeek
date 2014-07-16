@@ -14,7 +14,7 @@ define({ api: [
             "type": "String",
             "field": "city",
             "optional": false,
-            "description": "City name (avoid accents, no guarantee works other than France Metropolitan)."
+            "description": "City name (avoid accents, no space, no guarantee works other than France Metropolitan)."
           }
         ]
       }
@@ -236,7 +236,7 @@ define({ api: [
             "type": "String",
             "field": "city",
             "optional": false,
-            "description": "City name (avoid accents, France Metropolitan)."
+            "description": "City name (avoid accents, no space, France Metropolitan)."
           },
           {
             "group": "Parameter",
