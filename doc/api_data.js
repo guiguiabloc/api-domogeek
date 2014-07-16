@@ -400,6 +400,72 @@ define({ api: [
   },
   {
     "type": "get",
+    "url": "/weather/:city/:weatherrequest/:date/:responsetype",
+    "title": "Weather Status Request",
+    "name": "GetWeather",
+    "group": "Domogeek",
+    "description": "Ask for weather (temperature, humidity, pressure, windspeed...) for :date in :city (France)",
+    "parameter": {
+      "fields": {
+        "Parameter": [
+          {
+            "group": "Parameter",
+            "type": "String",
+            "field": "city",
+            "optional": false,
+            "description": "City name (avoid accents, no space, France Metropolitan)."
+          },
+          {
+            "group": "Parameter",
+            "type": "String",
+            "field": "weatherrequest",
+            "optional": false,
+            "description": "Ask for {temperature|humidity[pressure|windspeed|weather|all}."
+          },
+          {
+            "group": "Parameter",
+            "type": "String",
+            "field": "date",
+            "optional": false,
+            "description": "Date request {today | tomorrow}."
+          },
+          {
+            "group": "Parameter",
+            "type": "String",
+            "field": "responsetype",
+            "optional": true,
+            "description": "Specify Response Type (raw by default or specify json, only for single element)."
+          }
+        ]
+      }
+    },
+    "success": {
+      "examples": [
+        {
+          "title": "Success-Response:",
+          "content": "   HTTP/1.1 200 OK\n   {u'min': 15.039999999999999, u'max': 20.34, u'eve': 19.989999999999998, u'morn': 20.34, u'night': 15.039999999999999, u'day': 20.34}\n    HTTP/1.1 200 OK\n   {\"pressure\": 1031.0799999999999}\n"
+        }
+      ]
+    },
+    "error": {
+      "examples": [
+        {
+          "title": "Error-Response:",
+          "content": "   HTTP/1.1 400 Bad Request\n   400 Bad Request\n"
+        }
+      ]
+    },
+    "examples": [
+      {
+        "title": "Example usage:",
+        "content": "   curl http://api.domogeek.fr/weather/brest/all/today\n   curl http://api.domogeek.fr/weather/brest/pressure/today/json\n   curl http://api.domogeek.fr/weather/brest/weather/tomorrow\n"
+      }
+    ],
+    "version": "0.0.0",
+    "filename": "./apidomogeek.py"
+  },
+  {
+    "type": "get",
     "url": "/weekend/:daterequest/:responsetype",
     "title": "Week-end Status Request",
     "name": "GetWeekend",
