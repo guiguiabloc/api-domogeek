@@ -19,6 +19,7 @@ import ClassSchoolCalendar
 import ClassVigilance
 import ClassGeoLocation
 import ClassDawnDusk
+import ClassWeather
 
 school = ClassSchoolCalendar.schoolcalendar()
 dayrequest = Holiday.jourferie()
@@ -26,6 +27,7 @@ temporequest = ClassTempo.EDFTempo()
 vigilancerequest = ClassVigilance.vigilance()
 geolocationrequest = ClassGeoLocation.geolocation()
 dawnduskrequest = ClassDawnDusk.sunriseClass()
+weatherrequest = ClassWeather.weather()
 
 ##########
 # CONFIG #
@@ -74,6 +76,7 @@ urls = (
   '/vigilance/(.*)', 'vigilance',
   '/geolocation/(.*)', 'geolocation',
   '/sun/(.*)', 'dawndusk',
+  '/weather/(.*)', 'weather',
   '/', 'index'
 )
 
@@ -771,6 +774,95 @@ class dawndusk:
           else:
             return dayduration
 
+"""
+@api {get} /weather/:city/:weatherrequest/:date/:responsetype Weather Status Request
+@apiName GetWeather
+@apiGroup Domogeek
+@apiDescription Ask for weather (temperature, humidity, pressure, windspeed...) for :date in :city (France)
+@apiParam {String} city City name (avoid accents, no space, France Metropolitan).
+@apiParam {String} weatherrequest  Ask for {temperature|humidity[pressure|windspeed|weather|all}.
+@apiParam {String} date  Date request {today | tomorrow}.
+@apiParam {String} [responsetype]  Specify Response Type (raw by default or specify json, only for single element).
+@apiSuccessExample Success-Response:
+     HTTP/1.1 200 OK
+     {u'min': 15.039999999999999, u'max': 20.34, u'eve': 19.989999999999998, u'morn': 20.34, u'night': 15.039999999999999, u'day': 20.34}
+
+     HTTP/1.1 200 OK
+     {"pressure": 1031.0799999999999}
+
+@apiErrorExample Error-Response:
+     HTTP/1.1 400 Bad Request
+     400 Bad Request
+
+@apiExample Example usage:
+     curl http://api.domogeek.fr/weather/brest/all/today
+     curl http://api.domogeek.fr/weather/brest/pressure/today/json
+     curl http://api.domogeek.fr/weather/brest/weather/tomorrow
+
+"""
+
+class weather:
+    def GET(self,uri):
+      request = uri.split('/')
+      if request == ['']:
+        web.badrequest()
+        return "Incorrect request : /weather/city/{temperature|humidity|pressure|weather|windspeed|all}/{today|tomorrow}\n"
+      try:
+        city = request[0]
+      except:
+        return "Incorrect request : /weather/city/{temperature|humidity|pressure|weather|windspeed|all}/{today|tomorrow}\n"
+      try:
+        weatherrequestelement = request[1]
+      except:
+        return "Incorrect request : /weather/city/{temperature|humidity|pressure|weather|windspeed|all}/{today|tomorrow}\n"
+      try:
+        daterequest = request[2]
+      except:
+        return "Incorrect request : /weather/city/{temperature|humidity|pressure|weather|windspeed|all}/{today|tomorrow}\n"
+      try:
+        format = request[3]
+      except:
+        format = None
+      if weatherrequestelement not in ["temperature", "humidity", "pressure", "weather", "windspeed", "all"]:
+        return "Incorrect request : /weather/city/{temperature|humidity|pressure|weather|windspeed|all}/{today|tomorrow}\n"
+      responsegeolocation = urllib2.urlopen(localapiurl+'/geolocation/'+city)
+      resultgeolocation = json.load(responsegeolocation)
+      try:
+        latitude =  resultgeolocation["latitude"]
+        longitude =  resultgeolocation["longitude"]
+      except:
+        return "NO GEOLOCATION DATA AVAILABLE\n"
+      if request[2] == "today":
+        todayweather = weatherrequest.todayopenweathermap(latitude, longitude, weatherrequestelement)
+        if weatherrequestelement != "all" or weatherrequestelement != "temperature" or weatherrequestelement != "weather":
+          if format == "json":
+              web.header('Content-Type', 'application/json')
+              if weatherrequestelement == "humidity":
+                return json.dumps({"humidity": todayweather})
+              if weatherrequestelement == "pressure":
+                return json.dumps({"pressure": todayweather})
+              if weatherrequestelement == "windspeed":
+                return json.dumps({"windspeed": todayweather})
+          else:
+             return todayweather
+        else:
+            return todayweather
+ 
+      if request[2] == "tomorrow":
+        tomorrowweather = weatherrequest.tomorrowopenweathermap(latitude, longitude, weatherrequestelement)
+        if weatherrequestelement != "all" or weatherrequestelement != "temperature" or weatherrequestelement != "weather":
+          if format == "json":
+              web.header('Content-Type', 'application/json')
+              if weatherrequestelement == "humidity":
+                return json.dumps({"humidity": tomorrowweather})
+              if weatherrequestelement == "pressure":
+                return json.dumps({"pressure": tomorrowweather})
+              if weatherrequestelement == "windspeed":
+                return json.dumps({"windspeed": tomorrowweather})
+          else:
+           return tomorrowweather
+        else:
+           return tomorrowweather
 
 class MyDaemon(Daemon):
         def run(self):
