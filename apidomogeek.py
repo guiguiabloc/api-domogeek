@@ -512,7 +512,10 @@ class schoolholiday:
 @apiParam {String} [responsetype]  Specify Response Type (raw by default or specify json, only for single element).
 @apiSuccessExample Success-Response:
      HTTP/1.1 200 OK
-     vert
+     {"vigilanceflood": "jaune", "vigilancecolor": "orange", "vigilancerisk": "orages"}
+
+     HTTP/1.1 200 OK
+     vert 
 
 @apiErrorExample Error-Response:
      HTTP/1.1 400 Bad Request
