@@ -384,7 +384,7 @@ define({ api: [
       "examples": [
         {
           "title": "Success-Response:",
-          "content": "   HTTP/1.1 200 OK\n   vert\n"
+          "content": "   HTTP/1.1 200 OK\n   {\"vigilanceflood\": \"jaune\", \"vigilancecolor\": \"orange\", \"vigilancerisk\": \"orages\"}\n    HTTP/1.1 200 OK\n   vert\n"
         }
       ]
     },
