@@ -503,11 +503,12 @@ class schoolholiday:
 
 
 """
-@api {get} /vigilance/:department/:responsetype Vigilance MeteoFrance Color
+@api {get} /vigilance/:department/:vigilancerequest/:responsetype Vigilance MeteoFrance Color
 @apiName GetVigilance
 @apiGroup Domogeek
 @apiDescription Ask Vigilance color for :department
 @apiParam {String} department Department number (France Metropolitan).
+@apiParam {String} vigilancerequest Vigilance request {color|risk|flood|all}.
 @apiParam {String} [responsetype]  Specify Response Type (raw by default or specify json, only for single element).
 @apiSuccessExample Success-Response:
      HTTP/1.1 200 OK
@@ -518,8 +519,10 @@ class schoolholiday:
      400 Bad Request
 
 @apiExample Example usage:
-     curl http://api.domogeek.fr/vigilance/29
-     curl http://api.domogeek.fr/vigilance/29/json
+     curl http://api.domogeek.fr/vigilance/29/color
+     curl http://api.domogeek.fr/vigilance/29/color/json
+     curl http://api.domogeek.fr/vigilance/29/risk/json
+     curl http://api.domogeek.fr/vigilance/29/all
 
 """
 class vigilance:
@@ -527,21 +530,48 @@ class vigilance:
       request = uri.split('/')
       if request == ['']:
         web.badrequest()
-        return "Incorrect request : /vigilance/{department}\n"
+        return "Incorrect request : /vigilance/{department}/{color|risk|flood|all}\n"
       try:
         dep = request[0]
       except:
-        return "Incorrect request : /vigilance/{department}\n"
+        return "Incorrect request : /vigilance/{department}/{color|risk|flood|all}\n"
       try:
-        format = request[1]
+        vigilancequery = request[1]
+      except:
+        return "Incorrect request : /vigilance/{department}/{color|risk|flood|all}\n"
+      try:
+        format = request[2]
       except:
         format = None
+      if vigilancequery not in ["color","risk","flood", "all"]: 
+        return "Incorrect request : /vigilance/{department}/{color|risk|flood|all}\n"
       result = vigilancerequest.getvigilance(dep)
-      if format == "json":
+      color =  result[0]
+      risk =  result[1]
+      flood =  result[2]
+      if vigilancequery == "color":
+        if format == "json":
           web.header('Content-Type', 'application/json')
-          return json.dumps({"vigilance": result})
-      else:
-          return result
+          return json.dumps({"vigilancecolor": color})
+        else:
+          return color
+      if vigilancequery == "risk":
+        if format == "json":
+          web.header('Content-Type', 'application/json')
+          return json.dumps({"vigilancerisk": risk})
+        else:
+          return risk
+      if vigilancequery == "flood":
+        if format == "json":
+          web.header('Content-Type', 'application/json')
+          return json.dumps({"vigilanceflood": flood})
+        else:
+          return flood
+      if vigilancequery == "all":
+        web.header('Content-Type', 'application/json')
+        return json.dumps({"vigilancecolor": color, "vigilancerisk": risk, "vigilanceflood": flood})
+
+
 
 
 """
