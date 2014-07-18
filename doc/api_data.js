@@ -348,7 +348,7 @@ define({ api: [
   },
   {
     "type": "get",
-    "url": "/vigilance/:department/:responsetype",
+    "url": "/vigilance/:department/:vigilancerequest/:responsetype",
     "title": "Vigilance MeteoFrance Color",
     "name": "GetVigilance",
     "group": "Domogeek",
@@ -362,6 +362,13 @@ define({ api: [
             "field": "department",
             "optional": false,
             "description": "Department number (France Metropolitan)."
+          },
+          {
+            "group": "Parameter",
+            "type": "String",
+            "field": "vigilancerequest",
+            "optional": false,
+            "description": "Vigilance request {color|risk|flood|all}."
           },
           {
             "group": "Parameter",
@@ -392,7 +399,7 @@ define({ api: [
     "examples": [
       {
         "title": "Example usage:",
-        "content": "   curl http://api.domogeek.fr/vigilance/29\n   curl http://api.domogeek.fr/vigilance/29/json\n"
+        "content": "   curl http://api.domogeek.fr/vigilance/29/color\n   curl http://api.domogeek.fr/vigilance/29/color/json\n   curl http://api.domogeek.fr/vigilance/29/risk/json\n   curl http://api.domogeek.fr/vigilance/29/all\n"
       }
     ],
     "version": "0.0.0",
