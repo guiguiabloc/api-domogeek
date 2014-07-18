@@ -9,10 +9,8 @@
 import urllib
 from xml.dom import minidom
 
-
 class vigilance:
   def getvigilance(self, deprequest):
-    print deprequest
     if len(deprequest) != 2:
       return "Error in department number"
     url = 'http://vigilance.meteofrance.com/data/NXFR34_LFPW_.xml'
