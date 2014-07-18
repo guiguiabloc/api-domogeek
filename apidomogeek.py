@@ -503,10 +503,10 @@ class schoolholiday:
 
 
 """
-@api {get} /vigilance/:department/:vigilancerequest/:responsetype Vigilance MeteoFrance Color
+@api {get} /vigilance/:department/:vigilancerequest/:responsetype Vigilance MeteoFrance 
 @apiName GetVigilance
 @apiGroup Domogeek
-@apiDescription Ask Vigilance color for :department
+@apiDescription Ask Vigilance MeteoFrance for :department
 @apiParam {String} department Department number (France Metropolitan).
 @apiParam {String} vigilancerequest Vigilance request {color|risk|flood|all}.
 @apiParam {String} [responsetype]  Specify Response Type (raw by default or specify json, only for single element).
