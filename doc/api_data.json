@@ -349,10 +349,10 @@
   {
     "type": "get",
     "url": "/vigilance/:department/:vigilancerequest/:responsetype",
-    "title": "Vigilance MeteoFrance Color",
+    "title": "Vigilance MeteoFrance",
     "name": "GetVigilance",
     "group": "Domogeek",
-    "description": "Ask Vigilance color for :department",
+    "description": "Ask Vigilance MeteoFrance for :department",
     "parameter": {
       "fields": {
         "Parameter": [
