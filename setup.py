@@ -45,9 +45,9 @@ def required(filename):
 
 
 setup(
-    name="serialkiller-plugins",
+    name="api-domogeek",
     version="0.0.2",
-    description="Plugins for serialkiller project",
+    description="api.domogeek project",
     long_description=md('README.md') + md('CHANGELOG.txt'),
     author="guiguiabloc",
     author_email="guiguiabloc@guiguiabloc.com",
