@@ -1,0 +1,7 @@
+requests==2.2.0
+BeautifulSoup==3.2.1
+icalendar==3.8.2
+pytz==2014.4
+redis==2.10.1
+requests==2.2.0
+web.py==0.37
