@@ -14,7 +14,7 @@
 import urllib
 from urllib2 import urlopen
 import sys
-import bs4 as BeautifulSoup
+import BeautifulSoup
 
 class EDFTempo:
   def __init__(self):

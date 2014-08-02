@@ -6,13 +6,15 @@
 # http://api.domogeek.fr
 #
 
-import web, sys, time
-import json,hashlib
+import sys
+import json
+import hashlib
 import time
 from datetime import datetime,date,timedelta
-import urllib, urllib2
+import urllib2
+
+import web
 from Daemon import Daemon
-from xml.dom.minidom import parseString
 import Holiday
 import ClassTempo
 import ClassSchoolCalendar
@@ -20,6 +22,7 @@ import ClassVigilance
 import ClassGeoLocation
 import ClassDawnDusk
 import ClassWeather
+
 
 school = ClassSchoolCalendar.schoolcalendar()
 dayrequest = Holiday.jourferie()
@@ -55,13 +58,6 @@ try:
 except:
   print "No Redis module : https://pypi.python.org/pypi/redis/"
   sys.exit(1)
-
-rc= redis.Redis(host=redis_host, port=redis_port)
-rc.set("test", "ok")
-rc.expire("test" ,10)
-value = rc.get("test")
-if value is None:
-  print "Could not connect to  Redis  " + redis_host + " port " + redis_port
 
 
 web.config.debug = False
@@ -601,6 +597,16 @@ class geolocation:
       checkgeonames = False
       inredis = False
       request = uri.split('/')
+
+      # Check if redis running
+      rc= redis.Redis(host=redis_host, port=redis_port)
+      rc.set("test", "ok")
+      rc.expire("test" ,10)
+      value = rc.get("test")
+      if value is None:
+        web.badrequest()
+        return "Could not connect to  Redis  " + redis_host + " port " + redis_port
+
       if request == ['']:
         web.badrequest()
         return "Incorrect request : /geolocation/{city}\n"
