@@ -115,7 +115,6 @@ class index:
      curl http://api.domogeek.fr/holiday/25-12-2014/json
 
 """
-
 class holiday:
     def GET(self,uri):
       request = uri.split('/')
@@ -782,7 +781,7 @@ class dawndusk:
       if request[2] == "tomorrow" and dawnduskrequestelement == "all" :
           web.header('Content-Type', 'application/json')
           return json.dumps({"sunrise": sunrise, "zenith": zenith, "sunset": sunset, "dayduration": dayduration})
-      if request[2] == "now" and dawnduskrequestelement == "sunrise" :
+      if request[2] == "tomorrow" and dawnduskrequestelement == "sunrise" :
           if format == "json":
             web.header('Content-Type', 'application/json')
             return json.dumps({"sunrise": sunrise})
