@@ -719,6 +719,8 @@ class dawndusk:
         city = request[0]
       except:
         return "Incorrect request : /sun/city/{sunrise|sunset|zenith|dayduration|all}/{now|tomorrow}\n"
+      if len(city) < 1:
+          return "Incorrect request : /sun/city/{sunrise|sunset|zenith|dayduration|all}/{now|tomorrow}\n"
       try:
         print str(city)
       except UnicodeEncodeError:
