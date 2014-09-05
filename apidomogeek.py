@@ -720,6 +720,10 @@ class dawndusk:
       except:
         return "Incorrect request : /sun/city/{sunrise|sunset|zenith|dayduration|all}/{now|tomorrow}\n"
       try:
+        print str(city)
+      except UnicodeEncodeError:
+        return "Incorrect city format : /sun/city/{sunrise|sunset|zenith|dayduration|all}/{now|tomorrow}\n"
+      try:
         dawnduskrequestelement = request[1]
       except:
         return "Incorrect request : /sun/city/{sunrise|sunset|zenith|dayduration|all}/{now|tomorrow}\n"
