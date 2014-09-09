@@ -718,20 +718,25 @@ class dawndusk:
       try:
         city = request[0]
       except:
+        web.badrequest()
         return "Incorrect request : /sun/city/{sunrise|sunset|zenith|dayduration|all}/{now|tomorrow}\n"
       if len(city) < 1:
+          web.badrequest()
           return "Incorrect request : /sun/city/{sunrise|sunset|zenith|dayduration|all}/{now|tomorrow}\n"
       try:
         print str(city)
       except UnicodeEncodeError:
+        web.badrequest()
         return "Incorrect city format : /sun/city/{sunrise|sunset|zenith|dayduration|all}/{now|tomorrow}\n"
       try:
         dawnduskrequestelement = request[1]
       except:
+        web.badrequest()
         return "Incorrect request : /sun/city/{sunrise|sunset|zenith|dayduration|all}/{now|tomorrow}\n"
       try:
         daterequest = request[2]
       except:
+       web.badrequest()
        return "Incorrect request : /sun/city/{sunrise|sunset|zenith|dayduration|all}/{now|tomorrow}\n"
       try:
         format = request[3]
