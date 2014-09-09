@@ -536,16 +536,19 @@ class vigilance:
       try:
         dep = request[0]
       except:
+        web.badrequest()
         return "Incorrect request : /vigilance/{department}/{color|risk|flood|all}\n"
       try:
         vigilancequery = request[1]
       except:
+        web.badrequest()
         return "Incorrect request : /vigilance/{department}/{color|risk|flood|all}\n"
       try:
         format = request[2]
       except:
         format = None
       if len(dep) > 2:
+        web.badrequest()
         return "Incorrect request : /vigilance/{department number}/{color|risk|flood|all}\n"
       if vigilancequery not in ["color","risk","flood", "all"]: 
         return "Incorrect request : /vigilance/{department}/{color|risk|flood|all}\n"
