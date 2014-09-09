@@ -551,6 +551,7 @@ class vigilance:
         web.badrequest()
         return "Incorrect request : /vigilance/{department number}/{color|risk|flood|all}\n"
       if vigilancequery not in ["color","risk","flood", "all"]: 
+        web.badrequest()
         return "Incorrect request : /vigilance/{department}/{color|risk|flood|all}\n"
       result = vigilancerequest.getvigilance(dep)
       color =  result[0]
