@@ -374,14 +374,42 @@ class tempoedf:
       except:
         format = None
       if request[0] == "now":
-        result = temporequest.TempoToday()
+        try:
+          rediskeytemponow =  hashlib.md5("temponow").hexdigest()
+          gettemponow = rc.get(rediskeytemponow)
+          if gettemponow is None:
+            result = temporequest.TempoToday()
+            rediskeytemponow =  hashlib.md5("temponow").hexdigest()
+            rc.set(rediskeytemponow, result, 1800)
+            rc.expire(rediskeytemponow ,1800)
+            print "SET TEMPO NOW IN REDIS"
+          else:
+            result = gettemponow
+            print "FOUND TEMPO NOW IN REDIS"
+        except:
+            result = temporequest.TempoToday()
+
         if format == "json":
           web.header('Content-Type', 'application/json')
           return json.dumps({"tempocolor": result})
         else:
           return result
       if request[0] == "tomorrow":
-        result = temporequest.TempoTomorrow()
+        try:
+          rediskeytempotomorrow =  hashlib.md5("tempotomorrow").hexdigest()
+          gettempotomorrow = rc.get(rediskeytempotomorrow)
+          if gettempotomorrow is None:
+            result = temporequest.TempoTomorrow()
+            rediskeytempotomorrow =  hashlib.md5("tempotomorrow").hexdigest()
+            rc.set(rediskeytempotomorrow, result, 1800)
+            rc.expire(rediskeytempotomorrow ,1800)
+            print "SET TEMPO TOMORROW IN REDIS"
+          else:
+            result = gettempotomorrow
+            print "FOUND TEMPO TOMORROW IN REDIS"
+        except:
+            result = temporequest.TempoTomorrow()
+
         if format == "json":
           web.header('Content-Type', 'application/json')
           return json.dumps({"tempocolor": result})
