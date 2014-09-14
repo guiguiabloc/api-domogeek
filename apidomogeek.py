@@ -581,7 +581,26 @@ class vigilance:
       if vigilancequery not in ["color","risk","flood", "all"]: 
         web.badrequest()
         return "Incorrect request : /vigilance/{department}/{color|risk|flood|all}\n"
-      result = vigilancerequest.getvigilance(dep)
+
+      try:
+        rediskeyvigilance =  hashlib.md5(dep+"vigilance").hexdigest()
+        getvigilance = rc.get(rediskeyvigilance)
+        if getvigilance is None:
+          result = vigilancerequest.getvigilance(dep)
+          rediskeyvigilance =  hashlib.md5(dep+"vigilance").hexdigest()
+          rc.set(rediskeyvigilance, result, 1800)
+          rc.expire(rediskeyvigilance ,1800)
+          print "SET VIGILANCE "+dep+"  IN REDIS"
+        else:
+          tr1 =  getvigilance.replace("(","")
+          tr2 = tr1.replace(")","")
+          tr3 = tr2.replace("'","")
+          tr4 = tr3.replace(" ","")
+          result = tr4.split(',')
+          print "FOUND VIGILANCE "+dep+"  IN REDIS"
+      except:
+          result = vigilancerequest.getvigilance(dep)
+
       color =  result[0]
       risk =  result[1]
       flood =  result[2]
