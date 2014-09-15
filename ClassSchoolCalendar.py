@@ -21,13 +21,17 @@ class schoolcalendar:
     try:
       zoneok = str(zone.upper())
     except:
-      return "Wrong Zone (must be A, B or C)"
-    if len(zoneok) > 1:
-      return "Wrong Zone (must be A, B or C)"
-    if zoneok not in ["A","B","C"]:
-      return "Wrong Zone (must be A, B or C)"
-    else :
+      return "Wrong Zone (must be A, B, C or Corse)"
+    if len(zoneok) > 1 and zoneok != "CORSE" :
+      return "Wrong Zone (must be A, B, C or Corse)"
+    if zoneok not in ["A","B","C","CORSE"]:
+      return "Wrong Zone (must be A, B, C or Corse)"
+    elif zoneok == "CORSE":
+     URL = "http://www.ac-corse.fr/docs/com/cal_scol_Corse_2017.ics"
+     goto schoolcalendar_ics
+    else:
      URL = "http://media.education.gouv.fr/ics/Calendrier_Scolaire_Zone_"+zoneok+".ics"
+    label: schoolcalendar_ics 
      ics = urlopen(URL)
      cal = Calendar.from_ical(ics.read())
      datenow = datetime.now()
@@ -65,13 +69,17 @@ class schoolcalendar:
     try:
       zoneok = str(zone.upper())
     except:
-      return "Wrong Zone (must be A, B or C)"
-    if len(zoneok) > 1:
-      return "Wrong Zone (must be A, B or C)"
-    if zoneok not in ["A","B","C"]:
-      return "Wrong Zone (must be A, B or C)"
-    else :
+      return "Wrong Zone (must be A, B, C or Corse)"
+    if len(zoneok) > 1 and zoneok != "CORSE" :
+      return "Wrong Zone (must be A, B, C or Corse)"
+    if zoneok not in ["A","B","C","CORSE"]:
+      return "Wrong Zone (must be A, B, C or Corse)"
+    elif zoneok == "CORSE":
+     URL = "http://www.ac-corse.fr/docs/com/cal_scol_Corse_2017.ics"
+     goto isschoolcalendar_ics
+    else:
      URL = "http://media.education.gouv.fr/ics/Calendrier_Scolaire_Zone_"+zoneok+".ics"
+    label: isschoolcalendar_ics
      ics = urlopen(URL)
      cal = Calendar.from_ical(ics.read())
      #datenow = datetime.now()
