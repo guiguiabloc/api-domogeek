@@ -7,7 +7,7 @@
 #
 
 import web, sys, time
-import json,hashlib
+import json,hashlib,socket
 from datetime import datetime,date,timedelta
 import urllib, urllib2
 from Daemon import Daemon
@@ -76,6 +76,7 @@ urls = (
   '/geolocation/(.*)', 'geolocation',
   '/sun/(.*)', 'dawndusk',
   '/weather/(.*)', 'weather',
+  '/myip(.*)', 'myip',
   '/', 'index'
 )
 
@@ -972,6 +973,49 @@ class weather:
            return tomorrowweather
         else:
            return tomorrowweather
+
+"""
+@api {get} /myip/:responsetype Display Public IP
+@apiName GetMyPublicIP
+@apiGroup Domogeek
+@apiDescription Display your public IP
+@apiParam {String} [responsetype]  Specify Response Type (raw by default or specify json, only for single element).
+@apiSuccessExample Success-Response:
+     HTTP/1.1 200 OK
+     {"myip": "1.1.1.1"}
+
+@apiErrorExample Error-Response:
+     HTTP/1.1 400 Bad Request
+     400 Bad Request
+
+@apiExample Example usage:
+     curl http://api.domogeek.fr/myip
+     curl http://api.domogeek.fr/myip/json
+"""
+class myip:
+  def GET(self,uri,ip=None):
+    try:
+      request = uri.split('/')
+    except:
+      pass
+    try:
+      format = request[1]
+      print format
+    except:
+      format = None
+    ip = web.ctx.env.get('HTTP_X_FORWARDED_FOR', web.ctx.get('ip', ''))
+    for ip in ip.split(','):
+        ip = ip.strip()
+        try:
+            socket.inet_aton(ip)
+            if format == "json":
+              web.header('Content-Type', 'application/json')
+              return json.dumps({"myip": ip})
+            else:
+              return ip
+        except socket.error:
+            web.badrequest()
+            pass
 
 class MyDaemon(Daemon):
         def run(self):
