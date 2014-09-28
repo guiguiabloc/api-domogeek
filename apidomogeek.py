@@ -8,7 +8,6 @@
 
 import web, sys, time
 import json,hashlib
-import time
 from datetime import datetime,date,timedelta
 import urllib, urllib2
 from Daemon import Daemon
@@ -479,8 +478,22 @@ class schoolholiday:
       day = datenow.day
 
       if daterequest == "now":
-        result = school.isschoolcalendar(zoneok,day,month,year)
-        if result == None :
+        try:
+          rediskeyschoolholidaynow =  hashlib.md5("schoolholidaynow"+zoneok).hexdigest()
+          print rediskeyschoolholidaynow
+          getschoolholidaynow = rc.get(rediskeyschoolholidaynow)
+          if getschoolholidaynow is None:
+            result = school.isschoolcalendar(zoneok,day,month,year)
+            rediskeyschoolholidaynow =  hashlib.md5("schoolholidaynow"+zoneok).hexdigest()
+            rc.set(rediskeyschoolholidaynow, result, 1800)
+            rc.expire(rediskeyschoolholidaynow ,1800)
+            print "SET SCHOOL HOLIDAY "+zoneok+ " NOW IN REDIS"
+          else:
+            result = getschoolholidaynow
+            print "FOUND SCHOOL HOLIDAY "+zoneok+" NOW IN REDIS"
+        except:
+           result = school.isschoolcalendar(zoneok,day,month,year)
+        if result == None or result == "None":
           result = "False"
         try:
           description = result.decode('utf-8')

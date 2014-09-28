@@ -28,8 +28,11 @@ class schoolcalendar:
       return "Wrong Zone (must be A, B or C)"
     else :
      URL = "http://media.education.gouv.fr/ics/Calendrier_Scolaire_Zone_"+zoneok+".ics"
-     ics = urlopen(URL)
-     cal = Calendar.from_ical(ics.read())
+     try:
+       ics = urlopen(URL)
+       cal = Calendar.from_ical(ics.read())
+     except:
+       return "Data offline"
      datenow = datetime.now()
      year = datenow.year
      month = datenow.month
@@ -72,8 +75,11 @@ class schoolcalendar:
       return "Wrong Zone (must be A, B or C)"
     else :
      URL = "http://media.education.gouv.fr/ics/Calendrier_Scolaire_Zone_"+zoneok+".ics"
-     ics = urlopen(URL)
-     cal = Calendar.from_ical(ics.read())
+     try:
+       ics = urlopen(URL)
+       cal = Calendar.from_ical(ics.read())
+     except:
+       return "Data offline"
      #datenow = datetime.now()
      #year = datenow.year
      #month = datenow.month

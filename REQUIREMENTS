@@ -8,7 +8,6 @@ iCalendar https://pypi.python.org/pypi/icalendar
 requests https://pypi.python.org/simple/requests/
 redis https://pypi.python.org/pypi/redis/
 
-
 Geolocation Function need :
 Google API Key : https://developers.google.com/maps/documentation/geocoding/#api_key
 and/or
