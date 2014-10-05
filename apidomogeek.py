@@ -595,7 +595,8 @@ class vigilance:
       if vigilancequery not in ["color","risk","flood", "all"]: 
         web.badrequest()
         return "Incorrect request : /vigilance/{department}/{color|risk|flood|all}\n"
-
+      if dep == "92" or dep == "93" or dep == "94":
+        dep = "75"
       try:
         rediskeyvigilance =  hashlib.md5(dep+"vigilance").hexdigest()
         getvigilance = rc.get(rediskeyvigilance)
