@@ -107,7 +107,8 @@ class jourferie:
    
       # Vendredi saint (pour l'Alsace-Moselle)
       d = self.jourmoins(dp, -2)
-      if sd>=2:
+      if (sd==0) or (sd==2):
+      #if sd>=2:
           F.append(d)
           L.append(u"Vendredi saint (Alsace-Moselle)")
    
