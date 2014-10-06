@@ -109,7 +109,7 @@ class jourferie:
       d = self.jourmoins(dp, -2)
       if sd>=2:
           F.append(d)
-          L.append(u"Vendredi saint")
+          L.append(u"Vendredi saint (Alsace-Moselle)")
    
       # Dimanche de Paques
       d = dp
@@ -186,6 +186,13 @@ class jourferie:
       if (sd==0) or (sd==1 and nj<6) or (sd==2) or (sd==3 and nj<6):
           F.append(d)
           L.append(u"Jour de Noel")
+
+      # Saint Etienne Alsace
+      d = [26,12,an]
+      nj = self.numjoursem(d)
+      if (sd==0) or (sd==1 and nj<6) or (sd==2) or (sd==3 and nj<6):
+          F.append(d)
+          L.append(u"Saint-Etienne (Alsace)")
    
       return F, L
   
