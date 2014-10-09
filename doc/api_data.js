@@ -472,7 +472,7 @@ define({ api: [
             "type": "String",
             "field": "weatherrequest",
             "optional": false,
-            "description": "Ask for {temperature|humidity[pressure|windspeed|weather|all}."
+            "description": "Ask for {temperature|humidity[pressure|windspeed|weather|rain|all}."
           },
           {
             "group": "Parameter",
@@ -510,7 +510,7 @@ define({ api: [
     "examples": [
       {
         "title": "Example usage:",
-        "content": "   curl http://api.domogeek.fr/weather/brest/all/today\n   curl http://api.domogeek.fr/weather/brest/pressure/today/json\n   curl http://api.domogeek.fr/weather/brest/weather/tomorrow\n"
+        "content": "   curl http://api.domogeek.fr/weather/brest/all/today\n   curl http://api.domogeek.fr/weather/brest/pressure/today/json\n   curl http://api.domogeek.fr/weather/brest/weather/tomorrow\n   curl http://api.domogeek.fr/weather/brest/rain/today\n"
       }
     ],
     "version": "0.0.0",

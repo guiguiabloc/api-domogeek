@@ -59,3 +59,13 @@ class weather:
         else:
           return None
 
+  def getrain(self, lat, lng, api_key, date):
+        url = "http://api.worldweatheronline.com/free/v1//weather.ashx?q=%s,%s&key=%s&format=json&date=%s&includeLocation=no" % (urllib.quote(str(lat)), urllib.quote(str(lng)), urllib.quote(api_key), urllib.quote(date))
+        try:  
+          data = urllib.urlopen(url).read()
+          dataopenweathermap = json.loads(data)
+          rain = dataopenweathermap['data']['weather'][0]['precipMM']
+          return rain 
+        except:
+          return "no data"
+

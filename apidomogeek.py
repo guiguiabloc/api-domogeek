@@ -38,6 +38,7 @@ localapiurl= "http://api.domogeek.fr"
 googleapikey = ''
 bingmapapikey = ''
 geonameskey = ''
+worldweatheronlineapikey = ''
 
 redis_host =  "127.0.0.1"
 redis_port =  6379
@@ -891,7 +892,7 @@ class dawndusk:
 @apiGroup Domogeek
 @apiDescription Ask for weather (temperature, humidity, pressure, windspeed...) for :date in :city (France)
 @apiParam {String} city City name (avoid accents, no space, France Metropolitan).
-@apiParam {String} weatherrequest  Ask for {temperature|humidity[pressure|windspeed|weather|all}.
+@apiParam {String} weatherrequest  Ask for {temperature|humidity[pressure|windspeed|weather|rain|all}.
 @apiParam {String} date  Date request {today | tomorrow}.
 @apiParam {String} [responsetype]  Specify Response Type (raw by default or specify json, only for single element).
 @apiSuccessExample Success-Response:
@@ -909,6 +910,7 @@ class dawndusk:
      curl http://api.domogeek.fr/weather/brest/all/today
      curl http://api.domogeek.fr/weather/brest/pressure/today/json
      curl http://api.domogeek.fr/weather/brest/weather/tomorrow
+     curl http://api.domogeek.fr/weather/brest/rain/today
 
 """
 
@@ -917,25 +919,25 @@ class weather:
       request = uri.split('/')
       if request == ['']:
         web.badrequest()
-        return "Incorrect request : /weather/city/{temperature|humidity|pressure|weather|windspeed|all}/{today|tomorrow}\n"
+        return "Incorrect request : /weather/city/{temperature|humidity|pressure|weather|windspeed|rain|all}/{today|tomorrow}\n"
       try:
         city = request[0]
       except:
-        return "Incorrect request : /weather/city/{temperature|humidity|pressure|weather|windspeed|all}/{today|tomorrow}\n"
+        return "Incorrect request : /weather/city/{temperature|humidity|pressure|weather|windspeed|rain|all}/{today|tomorrow}\n"
       try:
         weatherrequestelement = request[1]
       except:
-        return "Incorrect request : /weather/city/{temperature|humidity|pressure|weather|windspeed|all}/{today|tomorrow}\n"
+        return "Incorrect request : /weather/city/{temperature|humidity|pressure|weather|windspeed|rain|all}/{today|tomorrow}\n"
       try:
         daterequest = request[2]
       except:
-        return "Incorrect request : /weather/city/{temperature|humidity|pressure|weather|windspeed|all}/{today|tomorrow}\n"
+        return "Incorrect request : /weather/city/{temperature|humidity|pressure|weather|windspeed|rain|all}/{today|tomorrow}\n"
       try:
         format = request[3]
       except:
         format = None
-      if weatherrequestelement not in ["temperature", "humidity", "pressure", "weather", "windspeed", "all"]:
-        return "Incorrect request : /weather/city/{temperature|humidity|pressure|weather|windspeed|all}/{today|tomorrow}\n"
+      if weatherrequestelement not in ["temperature", "humidity", "pressure", "weather", "windspeed", "rain", "all"]:
+        return "Incorrect request : /weather/city/{temperature|humidity|pressure|weather|windspeed|rain|all}/{today|tomorrow}\n"
       responsegeolocation = urllib2.urlopen(localapiurl+'/geolocation/'+city)
       resultgeolocation = json.load(responsegeolocation)
       try:
@@ -945,6 +947,22 @@ class weather:
         return "NO GEOLOCATION DATA AVAILABLE\n"
       if request[2] == "today":
         todayweather = weatherrequest.todayopenweathermap(latitude, longitude, weatherrequestelement)
+        datenow = datetime.now()
+        datetoday = datenow.strftime('%Y-%m-%d')
+        try:
+          rediskeytodayrain = hashlib.md5(str(latitude)+str(longitude)+str(datetoday)).hexdigest()
+          gettodayrain = rc.get(rediskeytodayrain)
+          if gettodayrain is None:
+            todayrain = weatherrequest.getrain(latitude, longitude, worldweatheronlineapikey, datetoday)
+            rediskeytodayrain = hashlib.md5(str(latitude)+str(longitude)+str(datetoday)).hexdigest()
+            rc.set(rediskeytodayrain, todayrain)
+            rc.expire(rediskeytodayrain, 3600)
+            print "SET RAIN IN REDIS"
+          else:
+            todayrain = gettodayrain
+            print "FOUND RAIN IN REDIS"
+        except:
+          todayrain = weatherrequest.getrain(latitude, longitude, worldweatheronlineapikey, datetoday)
         if weatherrequestelement != "all" or weatherrequestelement != "temperature" or weatherrequestelement != "weather":
           if format == "json":
               web.header('Content-Type', 'application/json')
@@ -954,13 +972,35 @@ class weather:
                 return json.dumps({"pressure": todayweather})
               if weatherrequestelement == "windspeed":
                 return json.dumps({"windspeed": todayweather})
+              if weatherrequestelement == "rain":
+                return json.dumps({"rain": todayrain})
           else:
-             return todayweather
+             if weatherrequestelement == "rain":
+               return todayrain
+             else:
+               return todayweather
         else:
             return todayweather
  
       if request[2] == "tomorrow":
         tomorrowweather = weatherrequest.tomorrowopenweathermap(latitude, longitude, weatherrequestelement)
+        datenow = datetime.now()
+        tomorrow =  datenow + timedelta(days=1)
+        datetomorrow = tomorrow.strftime('%Y-%m-%d')
+        try:
+          rediskeytomorrowrain = hashlib.md5(str(latitude)+str(longitude)+str(datetomorrow)).hexdigest()
+          gettomorrowrain = rc.get(rediskeytomorrowrain)
+          if gettomorrowrain is None:
+            tomorrowrain = weatherrequest.getrain(latitude, longitude, worldweatheronlineapikey, datetomorrow)
+            rediskeytomorrowrain = hashlib.md5(str(latitude)+str(longitude)+str(datetomorrow)).hexdigest()
+            rc.set(rediskeytomorrowrain, tomorrowrain)
+            rc.expire(rediskeytomorrowrain, 3600)
+            print "SET RAIN IN REDIS"
+          else:
+            tomorrowrain = gettomorrowrain
+            print "FOUND RAIN IN REDIS"
+        except:
+          tomorrowrain = weatherrequest.getrain(latitude, longitude, worldweatheronlineapikey, datetomorrow)
         if weatherrequestelement != "all" or weatherrequestelement != "temperature" or weatherrequestelement != "weather":
           if format == "json":
               web.header('Content-Type', 'application/json')
@@ -970,8 +1010,13 @@ class weather:
                 return json.dumps({"pressure": tomorrowweather})
               if weatherrequestelement == "windspeed":
                 return json.dumps({"windspeed": tomorrowweather})
+              if weatherrequestelement == "rain":
+                return json.dumps({"rain": tomorrowrain})
           else:
-           return tomorrowweather
+            if weatherrequestelement == "rain":
+              return tomorrowrain
+            else:
+              return tomorrowweather
         else:
            return tomorrowweather
 
