@@ -12,7 +12,7 @@ define({ api: [
           {
             "group": "Parameter",
             "type": "String",
-            "field": "zone",
+            "field": "zonerequest",
             "optional": false,
             "description": "Specify Zone Request  {nord|sud|ouest|paca}"
           },
@@ -52,7 +52,7 @@ define({ api: [
     "examples": [
       {
         "title": "Example usage:",
-        "content": "   curl http://api.domogeek.fr/ejpedf//nord/today\n   curl http://api.domogeek.fr/ejpedf/sud/tomorrow\n   curl http://api.domogeek.fr/ejpedf/paca/today/json\n"
+        "content": "   curl http://api.domogeek.fr/ejpedf/nord/today\n   curl http://api.domogeek.fr/ejpedf/sud/tomorrow\n   curl http://api.domogeek.fr/ejpedf/paca/today/json\n"
       }
     ],
     "version": "0.0.0",
