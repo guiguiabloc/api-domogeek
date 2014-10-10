@@ -19,6 +19,7 @@ import ClassVigilance
 import ClassGeoLocation
 import ClassDawnDusk
 import ClassWeather
+import ClassEJP
 
 school = ClassSchoolCalendar.schoolcalendar()
 dayrequest = Holiday.jourferie()
@@ -27,6 +28,7 @@ vigilancerequest = ClassVigilance.vigilance()
 geolocationrequest = ClassGeoLocation.geolocation()
 dawnduskrequest = ClassDawnDusk.sunriseClass()
 weatherrequest = ClassWeather.weather()
+ejprequest = ClassEJP.EDFejp()
 
 ##########
 # CONFIG #
@@ -70,6 +72,7 @@ web.config.debug = False
 urls = (
   '/holiday/(.*)', 'holiday',
   '/tempoedf/(.*)', 'tempoedf',
+  '/ejpedf/(.*)', 'ejpedf',
   '/schoolholiday/(.*)', 'schoolholiday',
   '/weekend/(.*)', 'weekend',
   '/holidayall/(.*)', 'holidayall',
@@ -482,7 +485,6 @@ class schoolholiday:
       if daterequest == "now":
         try:
           rediskeyschoolholidaynow =  hashlib.md5("schoolholidaynow"+zoneok).hexdigest()
-          print rediskeyschoolholidaynow
           getschoolholidaynow = rc.get(rediskeyschoolholidaynow)
           if getschoolholidaynow is None:
             result = school.isschoolcalendar(zoneok,day,month,year)
@@ -1062,6 +1064,104 @@ class myip:
         except socket.error:
             web.badrequest()
             pass
+
+
+"""
+@api {get} /ejpedf/:zone/:date/:responsetype EJP EDF Status Request
+@apiName GetEJP
+@apiGroup Domogeek
+@apiDescription Ask for EJP EDF Status
+@apiParam {String} zone  Specify Zone Request  {nord|sud|ouest|paca}
+@apiParam {String} date  Ask for today or tomorrow {today|tomorrow}
+@apiParam {String} [responsetype]  Specify Response Type (raw by default or specify json, only for single element).
+@apiSuccessExample Success-Response:
+HTTP/1.1 200 OK
+{"ejp": "False"}
+
+Return "True" : EJP day
+Return "False": No EJP day
+Return "ND"   : Non Specified
+
+@apiErrorExample Error-Response:
+HTTP/1.1 400 Bad Request
+400 Bad Request
+
+@apiExample Example usage:
+     curl http://api.domogeek.fr/ejpedf//nord/today
+     curl http://api.domogeek.fr/ejpedf/sud/tomorrow
+     curl http://api.domogeek.fr/ejpedf/paca/today/json
+"""
+class ejpedf:
+    def GET(self,uri):
+      request = uri.split('/')
+      if request == ['']:
+        web.badrequest()
+        return "Incorrect request : /edfejp/{nord|sud|ouest|paca}/{today|tomorrow}\n"
+      try:
+        zone = request[0]
+      except:
+        web.badrequest()
+        return "Incorrect request : /edfejp/{nord|sud|ouest|paca}/{today|tomorrow}\n"
+      try:
+        daterequest = request[1]
+      except:
+        web.badrequest()
+        return "Incorrect request : /edfejp/{nord|sud|ouest|paca}/{today|tomorrow}\n"
+      try:
+        format = request[2]
+      except:
+        format = None
+      try:
+        zoneok = str(zone.lower())
+      except:
+        web.badrequest()
+        return "Incorrect request : /edfejp/{nord|sud|ouest|paca}/{today|tomorrow}\n"
+      if zoneok not in ["nord", "sud", "paca", "ouest"]:
+        web.badrequest()
+        return "Incorrect request : /edfejp/{nord|sud|ouest|paca}/{today|tomorrow}\n"
+      if request[1] == "today":
+        try:
+          rediskeyejptoday =  hashlib.md5("ejptoday"+zoneok).hexdigest()
+          getejptoday = rc.get(rediskeyejptoday)
+          if getejptoday is None:
+            result = ejprequest.EJPToday(zoneok)
+            rediskeyejptoday =  hashlib.md5("ejptoday"+zoneok).hexdigest()
+            rc.set(rediskeyejptoday, result)
+            rc.expire(rediskeyejptoday, 1800)
+            print "SET EJP "+zoneok+" TODAY IN REDIS"
+          else:
+            result = getejptoday
+            print "FOUND EJP "+zoneok+ " TODAY IN REDIS"
+        except:
+            result = ejprequest.EJPToday()
+
+        if format == "json":
+          web.header('Content-Type', 'application/json')
+          return json.dumps({"ejp": result})
+        else:
+          return result
+
+      if request[1] == "tomorrow":
+        try:
+          rediskeyejptomorrow =  hashlib.md5("ejptomorrow"+zoneok).hexdigest()
+          getejptomorrow = rc.get(rediskeyejptomorrow)
+          if getejptomorrow is None:
+            result = ejprequest.EJPTomorrow(zoneok)
+            rediskeyejptomorrow =  hashlib.md5("ejptomorrow"+zoneok).hexdigest()
+            rc.set(rediskeyejptomorrow, result)
+            rc.expire(rediskeyejptomorrow, 1800)
+            print "SET EJP "+zoneok+" TOMORROW IN REDIS"
+          else:
+            result = getejptomorrow
+            print "FOUND EJP "+zoneok+ " TOMORROW IN REDIS"
+        except:
+            result = ejprequest.EJPTomorrow()
+
+        if format == "json":
+          web.header('Content-Type', 'application/json')
+          return json.dumps({"ejp": result})
+        else:
+          return result
 
 class MyDaemon(Daemon):
         def run(self):
