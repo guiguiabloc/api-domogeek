@@ -12,7 +12,7 @@
           {
             "group": "Parameter",
             "type": "String",
-            "field": "zonerequest",
+            "field": "zone",
             "optional": false,
             "description": "Specify Zone Request  {nord|sud|ouest|paca}"
           },

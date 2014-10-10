@@ -1071,7 +1071,7 @@ class myip:
 @apiName GetEJP
 @apiGroup Domogeek
 @apiDescription Ask for EJP EDF Status
-@apiParam {String} zonerequest  Specify Zone Request  {nord|sud|ouest|paca}
+@apiParam {String} zone  Specify Zone Request  {nord|sud|ouest|paca}
 @apiParam {String} date  Ask for today or tomorrow {today|tomorrow}
 @apiParam {String} [responsetype]  Specify Response Type (raw by default or specify json, only for single element).
 @apiSuccessExample Success-Response:
