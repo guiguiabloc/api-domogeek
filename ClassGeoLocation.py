@@ -14,8 +14,11 @@ class geolocation:
 
   def geogoogle(self, addr, api_key):
         url = "https://maps.googleapis.com/maps/api/geocode/json?address=%s&key=%s" % (urllib.quote(addr), urllib.quote(api_key))
-        data = urllib.urlopen(url).read()
-        datagoogle = json.loads(data)
+        try:
+          data = urllib.urlopen(url).read()
+          datagoogle = json.loads(data)
+        except urllib2.HTTPError, err:
+          return False
         assert datagoogle['status'] == "OK"
         #print "CHECK GOOGLE"
         googleresult = json.dumps([s['geometry']['location'] for s in datagoogle['results']], indent=3)
