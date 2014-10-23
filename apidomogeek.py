@@ -1057,9 +1057,11 @@ class myip:
         try:
             socket.inet_aton(ip)
             if format == "json":
+              web.header('Cache-control', 'public,max-age=0')
               web.header('Content-Type', 'application/json')
               return json.dumps({"myip": ip})
             else:
+              web.header('Cache-control', 'public,max-age=0')
               return ip
         except socket.error:
             web.badrequest()
