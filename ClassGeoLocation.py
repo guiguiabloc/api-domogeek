@@ -17,7 +17,7 @@ class geolocation:
         try:
           data = urllib.urlopen(url).read()
           datagoogle = json.loads(data)
-        except urllib2.HTTPError, err:
+        except:
           return False
         assert datagoogle['status'] == "OK"
         #print "CHECK GOOGLE"
@@ -33,7 +33,7 @@ class geolocation:
        try:
          data = urllib2.urlopen(url).read()
          databing = json.loads(data)
-       except urllib2.HTTPError, err:
+       except:
          return False
        assert databing['statusCode'] == 200
        #print "CHECK BING"
@@ -48,7 +48,7 @@ class geolocation:
        url = "http://api.geonames.org/search?q=%s&maxRows=1&username=%s" % (urllib.quote(addr), urllib.quote(api_key))
        try:
          data = urllib2.urlopen(url).read()
-       except urllib2.HTTPError, err:
+       except:
          return "Error"
        dom = parseString(data)
        latTag = dom.getElementsByTagName('lat')[0].toxml()
