@@ -305,13 +305,16 @@ class holidayall:
       except:
         return "Incorrect request : /holidayall/{zone}/{now|date(D-M-YYYY)}\n"
       if request[1] == "now":
-        responseholiday = urllib2.urlopen(localapiurl+'/holiday/now')
-        responseschoolholiday = urllib2.urlopen(localapiurl+'/schoolholiday/'+zoneok+'/now')
-        responseweekend = urllib2.urlopen(localapiurl+'/weekend/now')
-        resultholiday = responseholiday.read()
-        resultschoolholiday = responseschoolholiday.read()
-        resultschoolholidays = resultschoolholiday.decode('utf-8')
-        resultweekend = responseweekend.read()
+        try:
+          responseholiday = urllib2.urlopen(localapiurl+'/holiday/now')
+          responseschoolholiday = urllib2.urlopen(localapiurl+'/schoolholiday/'+zoneok+'/now')
+          responseweekend = urllib2.urlopen(localapiurl+'/weekend/now')
+          resultholiday = responseholiday.read()
+          resultschoolholiday = responseschoolholiday.read()
+          resultschoolholidays = resultschoolholiday.decode('utf-8')
+          resultweekend = responseweekend.read()
+        except:
+          return "no data available"
         web.header('Content-Type', 'application/json')
         return json.dumps({"holiday": resultholiday, "schoolholiday": resultschoolholidays, "weekend": resultweekend}, ensure_ascii=False).encode('utf8')
       if request[1] != "now":
@@ -328,13 +331,16 @@ class holidayall:
         except:
           web.badrequest()
           return "Incorrect date format : D-M-YYYY\n"
-        responseholiday = urllib2.urlopen(localapiurl+'/holiday/'+daterequest)
-        responseschoolholiday = urllib2.urlopen(localapiurl+'/schoolholiday/'+zoneok+'/'+daterequest)
-        responseweekend = urllib2.urlopen(localapiurl+'/weekend/'+daterequest)
-        resultholiday = responseholiday.read()
-        resultschoolholiday = responseschoolholiday.read()
-        resultschoolholidays = resultschoolholiday.decode('utf-8')
-        resultweekend = responseweekend.read()
+        try:
+          responseholiday = urllib2.urlopen(localapiurl+'/holiday/'+daterequest)
+          responseschoolholiday = urllib2.urlopen(localapiurl+'/schoolholiday/'+zoneok+'/'+daterequest)
+          responseweekend = urllib2.urlopen(localapiurl+'/weekend/'+daterequest)
+          resultholiday = responseholiday.read()
+          resultschoolholiday = responseschoolholiday.read()
+          resultschoolholidays = resultschoolholiday.decode('utf-8')
+          resultweekend = responseweekend.read()
+        except:
+          return "no data available"
         web.header('Content-Type', 'application/json')
         return json.dumps({"holiday": resultholiday, "schoolholiday": resultschoolholidays, "weekend": resultweekend}, ensure_ascii=False).encode('utf8')
 
@@ -600,6 +606,8 @@ class vigilance:
         return "Incorrect request : /vigilance/{department}/{color|risk|flood|all}\n"
       if dep == "92" or dep == "93" or dep == "94":
         dep = "75"
+      if dep == "20":
+        dep = "2A"
       try:
         rediskeyvigilance =  hashlib.md5(dep+"vigilance").hexdigest()
         getvigilance = rc.get(rediskeyvigilance)
@@ -813,8 +821,11 @@ class dawndusk:
         format = None
       if dawnduskrequestelement not in ["sunrise", "sunset", "zenith", "dayduration", "all"]:
         return "Incorrect request : /sun/city/{sunrise|sunset|zenith|dayduration|all}/{now|tomorrow}\n"
-      responsegeolocation = urllib2.urlopen(localapiurl+'/geolocation/'+city)
-      resultgeolocation = json.load(responsegeolocation)
+      try:
+        responsegeolocation = urllib2.urlopen(localapiurl+'/geolocation/'+city)
+        resultgeolocation = json.load(responsegeolocation)
+      except:
+        return "no data available"
       try:
         latitude =  resultgeolocation["latitude"]
         longitude =  resultgeolocation["longitude"]
@@ -940,8 +951,11 @@ class weather:
         format = None
       if weatherrequestelement not in ["temperature", "humidity", "pressure", "weather", "windspeed", "rain", "all"]:
         return "Incorrect request : /weather/city/{temperature|humidity|pressure|weather|windspeed|rain|all}/{today|tomorrow}\n"
-      responsegeolocation = urllib2.urlopen(localapiurl+'/geolocation/'+city)
-      resultgeolocation = json.load(responsegeolocation)
+      try:
+        responsegeolocation = urllib2.urlopen(localapiurl+'/geolocation/'+city)
+        resultgeolocation = json.load(responsegeolocation)
+      except:
+        return "no data available"
       try:
         latitude =  resultgeolocation["latitude"]
         longitude =  resultgeolocation["longitude"]
