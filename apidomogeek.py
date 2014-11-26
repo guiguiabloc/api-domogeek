@@ -822,15 +822,23 @@ class dawndusk:
       if dawnduskrequestelement not in ["sunrise", "sunset", "zenith", "dayduration", "all"]:
         return "Incorrect request : /sun/city/{sunrise|sunset|zenith|dayduration|all}/{now|tomorrow}\n"
       try:
-        responsegeolocation = urllib2.urlopen(localapiurl+'/geolocation/'+city)
-        resultgeolocation = json.load(responsegeolocation)
+        rediskey =  hashlib.md5(city).hexdigest()
+        getlocation = rc.get(rediskey)
+        if getlocation is None:
+          print "NO KEY IN REDIS"
+          responsegeolocation = urllib2.urlopen(localapiurl+'/geolocation/'+city)
+          resultgeolocation = json.load(responsegeolocation)
+          latitude =  resultgeolocation["latitude"]
+          longitude =  resultgeolocation["longitude"]
+        else:
+          print "FOUND LOCATION IN REDIS !!!"
+          tr1 =  getlocation.replace("(","")
+          tr2 = tr1.replace(")","")
+          data = tr2.split(',')
+          latitude = float(data[0])
+          longitude = float(data[1])
       except:
         return "no data available"
-      try:
-        latitude =  resultgeolocation["latitude"]
-        longitude =  resultgeolocation["longitude"]
-      except:
-        return "NO GEOLOCATION DATA AVAILABLE\n"
       if request[2] == "now":
         today=date.today()
       elif request[2] == "tomorrow":
