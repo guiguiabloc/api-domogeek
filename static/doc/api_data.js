@@ -1,0 +1,675 @@
+define({ api: [
+  {
+    "type": "get",
+    "url": "/ejpedf/:zone/:date/:responsetype",
+    "title": "EJP EDF Status Request",
+    "name": "GetEJP",
+    "group": "Domogeek",
+    "description": "Ask for EJP EDF Status",
+    "parameter": {
+      "fields": {
+        "Parameter": [
+          {
+            "group": "Parameter",
+            "type": "String",
+            "field": "zone",
+            "optional": false,
+            "description": "Specify Zone Request  {nord|sud|ouest|paca}"
+          },
+          {
+            "group": "Parameter",
+            "type": "String",
+            "field": "date",
+            "optional": false,
+            "description": "Ask for today or tomorrow {today|tomorrow}"
+          },
+          {
+            "group": "Parameter",
+            "type": "String",
+            "field": "responsetype",
+            "optional": true,
+            "description": "Specify Response Type (raw by default or specify json, only for single element)."
+          }
+        ]
+      }
+    },
+    "success": {
+      "examples": [
+        {
+          "title": "Success-Response:",
+          "content": "HTTP/1.1 200 OK\n{\"ejp\": \"False\"}\nReturn \"True\" : EJP day\nReturn \"False\": No EJP day\nReturn \"ND\"   : Non Specified\n"
+        }
+      ]
+    },
+    "error": {
+      "examples": [
+        {
+          "title": "Error-Response:",
+          "content": "HTTP/1.1 400 Bad Request\n400 Bad Request\n"
+        }
+      ]
+    },
+    "examples": [
+      {
+        "title": "Example usage:",
+        "content": "   curl http://api.domogeek.fr/ejpedf/nord/today\n   curl http://api.domogeek.fr/ejpedf/sud/tomorrow\n   curl http://api.domogeek.fr/ejpedf/paca/today/json\n"
+      }
+    ],
+    "version": "0.0.0",
+    "filename": "./apidomogeek.py"
+  },
+  {
+    "type": "get",
+    "url": "/geolocation/:city",
+    "title": "City Geolocation",
+    "name": "GetGeolocation",
+    "group": "Domogeek",
+    "description": "Ask geolocation (latitude/longitude) :city",
+    "parameter": {
+      "fields": {
+        "Parameter": [
+          {
+            "group": "Parameter",
+            "type": "String",
+            "field": "city",
+            "optional": false,
+            "description": "City name (avoid accents, no space, no guarantee works other than France Metropolitan)."
+          }
+        ]
+      }
+    },
+    "success": {
+      "examples": [
+        {
+          "title": "Success-Response:",
+          "content": "   HTTP/1.1 200 OK\n   {\"latitude\": 48.390394000000001, \"longitude\": -4.4860759999999997}\n"
+        }
+      ]
+    },
+    "error": {
+      "examples": [
+        {
+          "title": "Error-Response:",
+          "content": "   HTTP/1.1 400 Bad Request\n   400 Bad Request\n"
+        }
+      ]
+    },
+    "examples": [
+      {
+        "title": "Example usage:",
+        "content": "   curl http://api.domogeek.fr/geolocation/brest\n"
+      }
+    ],
+    "version": "0.0.0",
+    "filename": "./apidomogeek.py"
+  },
+  {
+    "type": "get",
+    "url": "/holiday/:date/:responsetype",
+    "title": "Holiday Status Request",
+    "name": "GetHoliday",
+    "group": "Domogeek",
+    "description": "Ask to know if :date is a holiday",
+    "parameter": {
+      "fields": {
+        "Parameter": [
+          {
+            "group": "Parameter",
+            "type": "String",
+            "field": "now",
+            "optional": false,
+            "description": "Ask for today."
+          },
+          {
+            "group": "Parameter",
+            "type": "String",
+            "field": "all",
+            "optional": false,
+            "description": "Ask for all entry."
+          },
+          {
+            "group": "Parameter",
+            "type": "Datetime",
+            "field": "D-M-YYYY",
+            "optional": false,
+            "description": "Ask for specific date."
+          },
+          {
+            "group": "Parameter",
+            "type": "String",
+            "field": "responsetype",
+            "optional": true,
+            "description": "Specify Response Type (raw by default or specify json, only for single element)."
+          }
+        ]
+      }
+    },
+    "success": {
+      "examples": [
+        {
+          "title": "Success-Response:",
+          "content": "   HTTP/1.1 200 OK\n   Jour de Noel\n    HTTP/1.1 200 OK\n   no\n"
+        }
+      ]
+    },
+    "error": {
+      "examples": [
+        {
+          "title": "Error-Response:",
+          "content": "   HTTP/1.1 400 Bad Request\n   400 Bad Request\n"
+        }
+      ]
+    },
+    "examples": [
+      {
+        "title": "Example usage:",
+        "content": "   curl http://api.domogeek.fr/holiday/now\n   curl http://api.domogeek.fr/holiday/now/json\n   curl http://api.domogeek.fr/holiday/all\n   curl http://api.domogeek.fr/holiday/25-12-2014/json\n"
+      }
+    ],
+    "version": "0.0.0",
+    "filename": "./apidomogeek.py"
+  },
+  {
+    "type": "get",
+    "url": "/holidayall/:zone/:daterequest",
+    "title": "All Holidays Status Request",
+    "name": "GetHolidayall",
+    "group": "Domogeek",
+    "description": "Ask to know if :daterequest is a holiday, school holiday and week-end day",
+    "parameter": {
+      "fields": {
+        "Parameter": [
+          {
+            "group": "Parameter",
+            "type": "String",
+            "field": "zone",
+            "optional": false,
+            "description": "School Zone (A, B or C)."
+          },
+          {
+            "group": "Parameter",
+            "type": "String",
+            "field": "daterequest",
+            "optional": false,
+            "description": "Ask for specific date {now | D-M-YYYY}."
+          }
+        ]
+      }
+    },
+    "success": {
+      "examples": [
+        {
+          "title": "Success-Response:",
+          "content": "   HTTP/1.1 200 OK\n   {\"holiday\": \"False\", \"weekend\": \"False\", \"schoolholiday\": \"Vacances de printemps - Zone A\"}\n"
+        }
+      ]
+    },
+    "error": {
+      "examples": [
+        {
+          "title": "Error-Response:",
+          "content": "   HTTP/1.1 400 Bad Request\n   400 Bad Request\n"
+        }
+      ]
+    },
+    "examples": [
+      {
+        "title": "Example usage:",
+        "content": "   curl http://api.domogeek.fr/holidayall/A/now\n   curl http://api.domogeek.fr/holidayall/B/25-02-2014\n"
+      }
+    ],
+    "version": "0.0.0",
+    "filename": "./apidomogeek.py"
+  },
+  {
+    "type": "get",
+    "url": "/myip/:responsetype",
+    "title": "Display Public IP",
+    "name": "GetMyPublicIP",
+    "group": "Domogeek",
+    "description": "Display your public IP",
+    "parameter": {
+      "fields": {
+        "Parameter": [
+          {
+            "group": "Parameter",
+            "type": "String",
+            "field": "responsetype",
+            "optional": true,
+            "description": "Specify Response Type (raw by default or specify json, only for single element)."
+          }
+        ]
+      }
+    },
+    "success": {
+      "examples": [
+        {
+          "title": "Success-Response:",
+          "content": "   HTTP/1.1 200 OK\n   {\"myip\": \"1.1.1.1\"}\n"
+        }
+      ]
+    },
+    "error": {
+      "examples": [
+        {
+          "title": "Error-Response:",
+          "content": "   HTTP/1.1 400 Bad Request\n   400 Bad Request\n"
+        }
+      ]
+    },
+    "examples": [
+      {
+        "title": "Example usage:",
+        "content": "   curl http://api.domogeek.fr/myip\n   curl http://api.domogeek.fr/myip/json\n"
+      }
+    ],
+    "version": "0.0.0",
+    "filename": "./apidomogeek.py"
+  },
+  {
+    "type": "get",
+    "url": "/schoolholiday/:zone/:daterequest/:responsetype",
+    "title": "School Holiday Status Request",
+    "name": "GetSchoolHoliday",
+    "group": "Domogeek",
+    "description": "Ask to know if :daterequest is a school holiday (UTF-8 response)",
+    "parameter": {
+      "fields": {
+        "Parameter": [
+          {
+            "group": "Parameter",
+            "type": "String",
+            "field": "zone",
+            "optional": false,
+            "description": "School Zone (A, B or C)."
+          },
+          {
+            "group": "Parameter",
+            "type": "String",
+            "field": "daterequest",
+            "optional": false,
+            "description": "Ask for specific date {now | all | D-M-YYYY}."
+          },
+          {
+            "group": "Parameter",
+            "type": "String",
+            "field": "responsetype",
+            "optional": true,
+            "description": "Specify Response Type (raw by default or specify json, only for single element)."
+          }
+        ]
+      }
+    },
+    "success": {
+      "examples": [
+        {
+          "title": "Success-Response:",
+          "content": "   HTTP/1.1 200 OK\n   Vacances de la Toussaint \n    HTTP/1.1 200 OK\n   False\n"
+        }
+      ]
+    },
+    "error": {
+      "examples": [
+        {
+          "title": "Error-Response:",
+          "content": "   HTTP/1.1 400 Bad Request\n   400 Bad Request\n"
+        }
+      ]
+    },
+    "examples": [
+      {
+        "title": "Example usage:",
+        "content": "   curl http://api.domogeek.fr/schoolholiday/A/now\n   curl http://api.domogeek.fr/schoolholiday/A/now/json\n   curl http://api.domogeek.fr/schoolholiday/A/all\n   curl http://api.domogeek.fr/schoolholiday/A/25-12-2014/json\n"
+      }
+    ],
+    "version": "0.0.0",
+    "filename": "./apidomogeek.py"
+  },
+  {
+    "type": "get",
+    "url": "/season/:responsetype",
+    "title": "Display Current Season",
+    "name": "GetSeason",
+    "group": "Domogeek",
+    "description": "Display current season",
+    "parameter": {
+      "fields": {
+        "Parameter": [
+          {
+            "group": "Parameter",
+            "type": "String",
+            "field": "responsetype",
+            "optional": true,
+            "description": "Specify Response Type (raw by default or specify json, only for single element)."
+          }
+        ]
+      }
+    },
+    "success": {
+      "examples": [
+        {
+          "title": "Success-Response:",
+          "content": "   HTTP/1.1 200 OK\n   {\"season\": \"winter\"}\n"
+        }
+      ]
+    },
+    "error": {
+      "examples": [
+        {
+          "title": "Error-Response:",
+          "content": "   HTTP/1.1 400 Bad Request\n   400 Bad Request\n"
+        }
+      ]
+    },
+    "examples": [
+      {
+        "title": "Example usage:",
+        "content": "   curl http://api.domogeek.fr/season\n   curl http://api.domogeek.fr/season/json\n"
+      }
+    ],
+    "version": "0.0.0",
+    "filename": "./apidomogeek.py"
+  },
+  {
+    "type": "get",
+    "url": "/sun/:city/:sunrequest/:date/:responsetype",
+    "title": "Sun Status Request",
+    "name": "GetSun",
+    "group": "Domogeek",
+    "description": "Ask to know sunrise, sunset, zenith, day duration for :date in :city (France)",
+    "parameter": {
+      "fields": {
+        "Parameter": [
+          {
+            "group": "Parameter",
+            "type": "String",
+            "field": "city",
+            "optional": false,
+            "description": "City name (avoid accents, no space, France Metropolitan)."
+          },
+          {
+            "group": "Parameter",
+            "type": "String",
+            "field": "sunrequest",
+            "optional": false,
+            "description": "Ask for {sunrise | sunset | zenith | dayduration | all}."
+          },
+          {
+            "group": "Parameter",
+            "type": "String",
+            "field": "date",
+            "optional": false,
+            "description": "Date request {now | tomorrow}."
+          },
+          {
+            "group": "Parameter",
+            "type": "String",
+            "field": "responsetype",
+            "optional": true,
+            "description": "Specify Response Type (raw by default or specify json, only for single element)."
+          }
+        ]
+      }
+    },
+    "success": {
+      "examples": [
+        {
+          "title": "Success-Response:",
+          "content": "   HTTP/1.1 200 OK\n   {\"sunset\": \"20:59\"}\n    HTTP/1.1 200 OK\n   {\"dayduration\": \"15:06\", \"sunset\": \"21:18\", \"zenith\": \"13:44\", \"sunrise\": \"6:11\"}\n"
+        }
+      ]
+    },
+    "error": {
+      "examples": [
+        {
+          "title": "Error-Response:",
+          "content": "   HTTP/1.1 400 Bad Request\n   400 Bad Request\n"
+        }
+      ]
+    },
+    "examples": [
+      {
+        "title": "Example usage:",
+        "content": "   curl http://api.domogeek.fr/sun/brest/all/now\n   curl http://api.domogeek.fr/sun/bastia/sunset/now/json\n   curl http://api.domogeek.fr/sun/strasbourg/sunrise/tomorrow\n"
+      }
+    ],
+    "version": "0.0.0",
+    "filename": "./apidomogeek.py"
+  },
+  {
+    "type": "get",
+    "url": "/tempoedf/:date/:responsetype",
+    "title": "Tempo EDF color Request",
+    "name": "GetTempo",
+    "group": "Domogeek",
+    "description": "Ask the EDF Tempo color",
+    "parameter": {
+      "fields": {
+        "Parameter": [
+          {
+            "group": "Parameter",
+            "type": "String",
+            "field": "now",
+            "optional": false,
+            "description": "Ask for today."
+          },
+          {
+            "group": "Parameter",
+            "type": "String",
+            "field": "tomorrow",
+            "optional": false,
+            "description": "Ask for tomorrow."
+          },
+          {
+            "group": "Parameter",
+            "type": "String",
+            "field": "responsetype",
+            "optional": true,
+            "description": "Specify Response Type (raw by default or specify json, only for single element)."
+          }
+        ]
+      }
+    },
+    "success": {
+      "examples": [
+        {
+          "title": "Success-Response:",
+          "content": "HTTP/1.1 200 OK\nContent-Type: application/json\nTransfer-Encoding: chunked\nDate: Thu, 03 Jul 2014 17:16:47 GMT\nServer: localhost\n{\"tempocolor\": \"bleu\"}\n"
+        }
+      ]
+    },
+    "error": {
+      "examples": [
+        {
+          "title": "Error-Response:",
+          "content": "HTTP/1.1 400 Bad Request\n400 Bad Request\n"
+        }
+      ]
+    },
+    "examples": [
+      {
+        "title": "Example usage:",
+        "content": "   curl http://api.domogeek.fr/tempoedf/now\n   curl http://api.domogeek.fr/tempoedf/now/json\n   curl http://api.domogeek.fr/tempoedf/tomorrow\n   curl http://api.domogeek.fr/tempoedf/tomorrow/json\n"
+      }
+    ],
+    "version": "0.0.0",
+    "filename": "./apidomogeek.py"
+  },
+  {
+    "type": "get",
+    "url": "/vigilance/:department/:vigilancerequest/:responsetype",
+    "title": "Vigilance MeteoFrance",
+    "name": "GetVigilance",
+    "group": "Domogeek",
+    "description": "Ask Vigilance MeteoFrance for :department",
+    "parameter": {
+      "fields": {
+        "Parameter": [
+          {
+            "group": "Parameter",
+            "type": "String",
+            "field": "department",
+            "optional": false,
+            "description": "Department number (France Metropolitan)."
+          },
+          {
+            "group": "Parameter",
+            "type": "String",
+            "field": "vigilancerequest",
+            "optional": false,
+            "description": "Vigilance request {color|risk|flood|all}."
+          },
+          {
+            "group": "Parameter",
+            "type": "String",
+            "field": "responsetype",
+            "optional": true,
+            "description": "Specify Response Type (raw by default or specify json, only for single element)."
+          }
+        ]
+      }
+    },
+    "success": {
+      "examples": [
+        {
+          "title": "Success-Response:",
+          "content": "   HTTP/1.1 200 OK\n   {\"vigilanceflood\": \"jaune\", \"vigilancecolor\": \"orange\", \"vigilancerisk\": \"orages\"}\n    HTTP/1.1 200 OK\n   vert\n"
+        }
+      ]
+    },
+    "error": {
+      "examples": [
+        {
+          "title": "Error-Response:",
+          "content": "   HTTP/1.1 400 Bad Request\n   400 Bad Request\n"
+        }
+      ]
+    },
+    "examples": [
+      {
+        "title": "Example usage:",
+        "content": "   curl http://api.domogeek.fr/vigilance/29/color\n   curl http://api.domogeek.fr/vigilance/29/color/json\n   curl http://api.domogeek.fr/vigilance/29/risk/json\n   curl http://api.domogeek.fr/vigilance/29/all\n"
+      }
+    ],
+    "version": "0.0.0",
+    "filename": "./apidomogeek.py"
+  },
+  {
+    "type": "get",
+    "url": "/weather/:city/:weatherrequest/:date/:responsetype",
+    "title": "Weather Status Request",
+    "name": "GetWeather",
+    "group": "Domogeek",
+    "description": "Ask for weather (temperature, humidity, pressure, windspeed...) for :date in :city (France)",
+    "parameter": {
+      "fields": {
+        "Parameter": [
+          {
+            "group": "Parameter",
+            "type": "String",
+            "field": "city",
+            "optional": false,
+            "description": "City name (avoid accents, no space, France Metropolitan)."
+          },
+          {
+            "group": "Parameter",
+            "type": "String",
+            "field": "weatherrequest",
+            "optional": false,
+            "description": "Ask for {temperature|humidity[pressure|windspeed|weather|rain|all}."
+          },
+          {
+            "group": "Parameter",
+            "type": "String",
+            "field": "date",
+            "optional": false,
+            "description": "Date request {today | tomorrow}."
+          },
+          {
+            "group": "Parameter",
+            "type": "String",
+            "field": "responsetype",
+            "optional": true,
+            "description": "Specify Response Type (raw by default or specify json, only for single element)."
+          }
+        ]
+      }
+    },
+    "success": {
+      "examples": [
+        {
+          "title": "Success-Response:",
+          "content": "   HTTP/1.1 200 OK\n   {u'min': 15.039999999999999, u'max': 20.34, u'eve': 19.989999999999998, u'morn': 20.34, u'night': 15.039999999999999, u'day': 20.34}\n    HTTP/1.1 200 OK\n   {\"pressure\": 1031.0799999999999}\n"
+        }
+      ]
+    },
+    "error": {
+      "examples": [
+        {
+          "title": "Error-Response:",
+          "content": "   HTTP/1.1 400 Bad Request\n   400 Bad Request\n"
+        }
+      ]
+    },
+    "examples": [
+      {
+        "title": "Example usage:",
+        "content": "   curl http://api.domogeek.fr/weather/brest/all/today\n   curl http://api.domogeek.fr/weather/brest/pressure/today/json\n   curl http://api.domogeek.fr/weather/brest/weather/tomorrow\n   curl http://api.domogeek.fr/weather/brest/rain/today\n"
+      }
+    ],
+    "version": "0.0.0",
+    "filename": "./apidomogeek.py"
+  },
+  {
+    "type": "get",
+    "url": "/weekend/:daterequest/:responsetype",
+    "title": "Week-end Status Request",
+    "name": "GetWeekend",
+    "group": "Domogeek",
+    "description": "Ask to know if :daterequest is a week-end day",
+    "parameter": {
+      "fields": {
+        "Parameter": [
+          {
+            "group": "Parameter",
+            "type": "String",
+            "field": "daterequest",
+            "optional": false,
+            "description": "Ask for specific date {now | tomorrow | D-M-YYYY}."
+          },
+          {
+            "group": "Parameter",
+            "type": "String",
+            "field": "responsetype",
+            "optional": true,
+            "description": "Specify Response Type (raw by default or specify json, only for single element)."
+          }
+        ]
+      }
+    },
+    "success": {
+      "examples": [
+        {
+          "title": "Success-Response:",
+          "content": "   HTTP/1.1 200 OK\n   True\n    HTTP/1.1 200 OK\n   False\n"
+        }
+      ]
+    },
+    "error": {
+      "examples": [
+        {
+          "title": "Error-Response:",
+          "content": "   HTTP/1.1 400 Bad Request\n   400 Bad Request\n"
+        }
+      ]
+    },
+    "examples": [
+      {
+        "title": "Example usage:",
+        "content": "   curl http://api.domogeek.fr/weekend/now\n   curl http://api.domogeek.fr/weekend/tomorrow\n   curl http://api.domogeek.fr/weekend/now/json\n   curl http://api.domogeek.fr/weekend/16-07-2014/json\n"
+      }
+    ],
+    "version": "0.0.0",
+    "filename": "./apidomogeek.py"
+  }
+] });
