@@ -80,6 +80,7 @@ urls = (
   '/geolocation/(.*)', 'geolocation',
   '/sun/(.*)', 'dawndusk',
   '/weather/(.*)', 'weather',
+  '/season(.*)', 'season',
   '/myip(.*)', 'myip',
   '/', 'index'
 )
@@ -1096,6 +1097,52 @@ class myip:
         except socket.error:
             web.badrequest()
             pass
+
+"""
+@api {get} /season/:responsetype Display Current Season
+@apiName GetSeason
+@apiGroup Domogeek
+@apiDescription Display current season 
+@apiParam {String} [responsetype]  Specify Response Type (raw by default or specify json, only for single element).
+@apiSuccessExample Success-Response:
+     HTTP/1.1 200 OK
+     {"season": "winter"}
+
+@apiErrorExample Error-Response:
+     HTTP/1.1 400 Bad Request
+     400 Bad Request
+
+@apiExample Example usage:
+     curl http://api.domogeek.fr/season
+     curl http://api.domogeek.fr/season/json
+"""
+class season:
+  def GET(self,uri):
+    try:
+      request = uri.split('/')
+    except:
+      pass
+    try:
+      format = request[1]
+    except:
+      format = None
+    today = datetime.today().timetuple().tm_yday
+    spring = range(80, 172)
+    summer = range(172, 264)
+    autumn = range(264, 355)
+    if today in spring:
+      season = 'spring'
+    elif today in summer:
+      season = 'summer'
+    elif today in autumn:
+      season = 'autumn'
+    else:
+      season = 'winter'
+    if format == "json":
+      web.header('Content-Type', 'application/json')
+      return json.dumps({"season": season})
+    else:
+      return season
 
 
 """
