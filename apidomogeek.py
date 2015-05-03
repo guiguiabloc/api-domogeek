@@ -99,6 +99,7 @@ class index:
 @apiGroup Domogeek
 @apiDescription Ask to know if :date is a holiday
 @apiParam {String} now  Ask for today.
+@apiParam {String} tomorrow  Ask for tomorrow.
 @apiParam {String} all  Ask for all entry.
 @apiParam {Datetime} D-M-YYYY  Ask for specific date.
 @apiParam {String} [responsetype]  Specify Response Type (raw by default or specify json, only for single element).
@@ -125,7 +126,7 @@ class holiday:
       request = uri.split('/')
       if request == ['']:
         web.badrequest()
-        return "Incorrect request : /holiday/{now / date(D-M-YYYY)}\n"
+        return "Incorrect request : /holiday/{now|tomorrow|date(D-M-YYYY)}\n"
       try:
         format = request[1]
       except:
@@ -135,6 +136,18 @@ class holiday:
         year = datenow.year
         month = datenow.month
         day = datenow.day 
+        result = dayrequest.estferie([day,month,year])
+        if format == "json":
+          web.header('Content-Type', 'application/json')
+          return json.dumps({"holiday": result})
+        else:
+          return result
+      if request[0] == "tomorrow":
+        datenow = datetime.now()
+        datetomorrow = datenow + timedelta(days=1)
+        year = datetomorrow.year
+        month = datetomorrow.month
+        day = datetomorrow.day
         result = dayrequest.estferie([day,month,year])
         if format == "json":
           web.header('Content-Type', 'application/json')
@@ -152,7 +165,7 @@ class holiday:
           response = json.dumps(listvalue)
         return response
 
-      if request[0] != "now" and request[0] != "all":
+      if request[0] != "now" and request[0] != "all" and request[0] != "tomorrow":
         try:
           daterequest = request[0]
           result = daterequest.split('-') 
@@ -269,7 +282,7 @@ class weekend:
 @apiGroup Domogeek
 @apiDescription Ask to know if :daterequest is a holiday, school holiday and week-end day
 @apiParam {String} zone  School Zone (A, B or C).
-@apiParam {String} daterequest Ask for specific date {now | D-M-YYYY}.
+@apiParam {String} daterequest Ask for specific date {now | tomorrow | D-M-YYYY}.
 @apiSuccessExample Success-Response:
      HTTP/1.1 200 OK
      {"holiday": "False", "weekend": "False", "schoolholiday": "Vacances de printemps - Zone A"}
@@ -281,6 +294,7 @@ class weekend:
 
 @apiExample Example usage:
      curl http://api.domogeek.fr/holidayall/A/now
+     curl http://api.domogeek.fr/holidayall/A/tomorrow
      curl http://api.domogeek.fr/holidayall/B/25-02-2014
 """
 class holidayall:
@@ -288,11 +302,11 @@ class holidayall:
       request = uri.split('/')
       if request == ['']:
         web.badrequest()
-        return "Incorrect request : /holidayall/{zone}/{now|date(D-M-YYYY)}\n"
+        return "Incorrect request : /holidayall/{zone}/{now|tomorrow|date(D-M-YYYY)}\n"
       try:
         zone = request[0]
       except:
-        return "Incorrect request : /holidayall/{zone}/{now|date(D-M-YYYY)}\n"
+        return "Incorrect request : /holidayall/{zone}/{now|tomorrow|date(D-M-YYYY)}\n"
       try:
         zoneok = str(zone.upper())
       except:
@@ -300,11 +314,11 @@ class holidayall:
       if len(zoneok) > 1:
         return "Wrong Zone (must be A, B or C)"
       if zoneok not in ["A","B","C"]:
-        return "Incorrect request : /holidayall/{zone}/{now|date(D-M-YYYY)}\n"
+        return "Incorrect request : /holidayall/{zone}/{now|tomorrow|date(D-M-YYYY)}\n"
       try:
         daterequest = request[1]
       except:
-        return "Incorrect request : /holidayall/{zone}/{now|date(D-M-YYYY)}\n"
+        return "Incorrect request : /holidayall/{zone}/{now|tomorrow|date(D-M-YYYY)}\n"
       if request[1] == "now":
         try:
           responseholiday = urllib2.urlopen(localapiurl+'/holiday/now')
@@ -318,7 +332,21 @@ class holidayall:
           return "no data available"
         web.header('Content-Type', 'application/json')
         return json.dumps({"holiday": resultholiday, "schoolholiday": resultschoolholidays, "weekend": resultweekend}, ensure_ascii=False).encode('utf8')
-      if request[1] != "now":
+      if request[1] == "tomorrow":
+        try:
+          responseholiday = urllib2.urlopen(localapiurl+'/holiday/tomorrow')
+          responseschoolholiday = urllib2.urlopen(localapiurl+'/schoolholiday/'+zoneok+'/tomorrow')
+          responseweekend = urllib2.urlopen(localapiurl+'/weekend/tomorrow')
+          resultholiday = responseholiday.read()
+          resultschoolholiday = responseschoolholiday.read()
+          resultschoolholidays = resultschoolholiday.decode('utf-8')
+          resultweekend = responseweekend.read()
+        except:
+          return "no data available"
+        web.header('Content-Type', 'application/json')
+        return json.dumps({"holiday": resultholiday, "schoolholiday": resultschoolholidays, "weekend": resultweekend}, ensure_ascii=False).encode('utf8')
+      
+      if request[1] != "now" and request[1] != "tomorrow":
         try:
           daterequest = request[1]
           day,month,year = daterequest.split('-')
@@ -462,11 +490,11 @@ class schoolholiday:
       request = uri.split('/')
       if request == ['']:
         web.badrequest()
-        return "Incorrect request : /schoolholiday/{zone}/{now/all/date(D-M-YYYY)}\n"
+        return "Incorrect request : /schoolholiday/{zone}/{now|tomorrow|all|date(D-M-YYYY)}\n"
       try:
         zone = request[0]
       except:
-        return "Incorrect request : /schoolholiday/{zone}/{now/all/date(D-M-YYYY)}\n"
+        return "Incorrect request : /schoolholiday/{zone}/{now|tomorrow|all|date(D-M-YYYY)}\n"
       try:
         zoneok = str(zone.upper())
       except:
@@ -475,11 +503,11 @@ class schoolholiday:
         return "Wrong Zone (must be A, B or C)"
 
       if zoneok not in ["A","B","C"]:
-        return "Incorrect request : /schoolholiday/{zone}/{now/all/date(D-M-YYYY)}\n"
+        return "Incorrect request : /schoolholiday/{zone}/{now|tomorrow|all|date(D-M-YYYY)}\n"
       try:
         daterequest = request[1]
       except:
-        return "Incorrect request : /schoolholiday/{zone}/{now/all/date(D-M-YYYY)}\n"
+        return "Incorrect request : /schoolholiday/{zone}/{now|tomorrow|all|date(D-M-YYYY)}\n"
       try:
         format = request[2]
       except:
@@ -515,6 +543,39 @@ class schoolholiday:
           return json.dumps({"schoolholiday": description}, ensure_ascii=False).encode('utf8')
         else:
           return description
+
+      if daterequest == "tomorrow":
+        datenow = datetime.now()
+        datetomorrow = datenow + timedelta(days=1)
+        yeartomorrow = datetomorrow.year
+        monthtomorrow = datetomorrow.month
+        daytomorrow = datetomorrow.day
+        try:
+          rediskeyschoolholidaytomorrow =  hashlib.md5("schoolholidaytomorrow"+zoneok).hexdigest()
+          getschoolholidaytomorrow = rc.get(rediskeyschoolholidaytomorrow)
+          if getschoolholidaytomorrow is None:
+            result = school.isschoolcalendar(zoneok,daytomorrow,monthtomorrow,yeartomorrow)
+            rediskeyschoolholidaytomorrow =  hashlib.md5("schoolholidaytomorrow"+zoneok).hexdigest()
+            rc.set(rediskeyschoolholidaytomorrow, result, 1800)
+            rc.expire(rediskeyschoolholidaytomorrow ,1800)
+            print "SET SCHOOL HOLIDAY "+zoneok+ " NOW IN REDIS"
+          else:
+            result = getschoolholidaytomorrow
+            print "FOUND SCHOOL HOLIDAY "+zoneok+" NOW IN REDIS"
+        except:
+           result = school.isschoolcalendar(zoneok,daytomorrow,monthtomorrow,yeartomorrow)
+        if result == None or result == "None":
+          result = "False"
+        try:
+          description = result.decode('utf-8')
+        except:
+          description = result
+        if format == "json":
+          web.header('Content-Type', 'application/json')
+          return json.dumps({"schoolholiday": description}, ensure_ascii=False).encode('utf8')
+        else:
+          return description
+
       if daterequest == "all":
         result = school.getschoolcalendar(zone)
         try:
@@ -523,7 +584,7 @@ class schoolholiday:
           description = result
         web.header('Content-Type', 'application/json')
         return description
-      if daterequest != "now" and daterequest != "all":
+      if daterequest != "now" and daterequest != "all" and daterequest != "tomorrow":
         try:
           result = daterequest.split('-')
         except:
