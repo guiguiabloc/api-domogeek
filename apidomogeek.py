@@ -558,10 +558,10 @@ class schoolholiday:
             rediskeyschoolholidaytomorrow =  hashlib.md5("schoolholidaytomorrow"+zoneok).hexdigest()
             rc.set(rediskeyschoolholidaytomorrow, result, 1800)
             rc.expire(rediskeyschoolholidaytomorrow ,1800)
-            print "SET SCHOOL HOLIDAY "+zoneok+ " NOW IN REDIS"
+            print "SET SCHOOL HOLIDAY "+zoneok+ " TOMORROW IN REDIS"
           else:
             result = getschoolholidaytomorrow
-            print "FOUND SCHOOL HOLIDAY "+zoneok+" NOW IN REDIS"
+            print "FOUND SCHOOL HOLIDAY "+zoneok+" TOMORROW IN REDIS"
         except:
            result = school.isschoolcalendar(zoneok,daytomorrow,monthtomorrow,yeartomorrow)
         if result == None or result == "None":
