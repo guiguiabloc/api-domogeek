@@ -60,8 +60,8 @@
   },
   {
     "type": "get",
-    "url": "/feastedsaint/:date",
-    "title": "or :name/:responsetype Feasted Day of Saint Request",
+    "url": "/feastedsaint/:date/:responsetype",
+    "title": "Feasted Day of Saint Request",
     "name": "GetFeastedSaintDay",
     "group": "Domogeek",
     "description": "Ask to know feasted Saint for :date or date for :name",
