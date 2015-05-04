@@ -82,6 +82,7 @@ urls = (
   '/weather/(.*)', 'weather',
   '/season(.*)', 'season',
   '/myip(.*)', 'myip',
+  '/feastedsaint/(.*)', 'feastedsaint',
   '/', 'index'
 )
 
@@ -1300,6 +1301,106 @@ class ejpedf:
         if format == "json":
           web.header('Content-Type', 'application/json')
           return json.dumps({"ejp": result})
+        else:
+          return result
+
+"""
+@api {get} /feastedsaint/:date or :name/:responsetype Feasted Day of Saint Request
+@apiName GetFeastedSaintDay
+@apiGroup Domogeek
+@apiDescription Ask to know feasted Saint for :date or date for :name
+@apiParam {String} now  Ask for today.
+@apiParam {String} tomorrow  Ask for tomorrow.
+@apiParam {String} name  Search feasted saint day for name.
+@apiParam {Datetime} D-M  Ask for specific date.
+@apiParam {String} [responsetype]  Specify Response Type (raw by default or specify json, only for single element).
+@apiSuccessExample Success-Response:
+     HTTP/1.1 200 OK
+     Guillaume
+     10-1
+@apiErrorExample Error-Response:
+     HTTP/1.1 400 Bad Request
+     400 Bad Request
+
+@apiExample Example usage:
+     curl http://api.domogeek.fr/feastedsaint/guillaume
+     curl http://api.domogeek.fr/feastedsaint/now
+     curl http://api.domogeek.fr/feastedsaint/now/json
+     curl http://api.domogeek.fr/feastedsaint/1-5
+     curl http://api.domogeek.fr/feastedsaint/2-12/json
+
+"""
+class feastedsaint:
+    def GET(self,uri):
+      request = uri.split('/')
+      if request == ['']:
+        web.badrequest()
+        return "Incorrect request : /feastedsaint/{now|tomorrow|date(D-M)|name}\n"
+      try:
+        format = request[1]
+      except:
+        format = None
+      if request[0] == "now":
+        datenow = datetime.now()
+        month = datenow.month
+        day = datenow.day
+        todayrequest = str(day)+"-"+str(month)
+        rediskeyfeastedsaint = hashlib.md5(todayrequest+"feastedsaint").hexdigest()
+        result = rc.get(rediskeyfeastedsaint)
+        if format == "json":
+          web.header('Content-Type', 'application/json')
+          return json.dumps({"feastedsaint": result})
+        else:
+          return result
+      if request[0] == "tomorrow":
+        datenow = datetime.now()
+        datetomorrow = datenow + timedelta(days=1)
+        month = datetomorrow.month
+        day = datetomorrow.day
+        todayrequest = str(day)+"-"+str(month)
+        rediskeyfeastedsaint = hashlib.md5(todayrequest+"feastedsaint").hexdigest()
+        result = rc.get(rediskeyfeastedsaint)
+        if format == "json":
+          web.header('Content-Type', 'application/json')
+          return json.dumps({"feastedsaint": result})
+        else:
+          return result
+
+      if request[0] != "now" and request[0] != "tomorrow":
+        try:
+          daterequest = request[0]
+          result = daterequest.split('-')
+        except:
+          web.badrequest()
+          return "Incorrect date format : D-M\n"
+        try:
+          day = int(result[0])
+          month = int(result[1])
+        except:
+          try:
+            namerequest = request[0]
+            namesearch = namerequest.lower()
+            rediskeynamefeastedsaint = hashlib.md5(namesearch+"feastedsaint").hexdigest()
+            result = rc.get(rediskeynamefeastedsaint)
+            if result is None:
+              result = "no name found or incorrect date format"
+            if format == "json":
+              web.header('Content-Type', 'application/json')
+              return json.dumps({"feastedsaint": result})
+            else:
+              return result
+          except:
+            web.badrequest()
+            return "Incorrect date format : D-M\n"
+        if day > 31 or month > 12:
+          web.badrequest()
+          return "Incorrect date format : D-M\n"
+        todayrequest = str(day)+"-"+str(month)
+        rediskeyfeastedsaint = hashlib.md5(todayrequest+"feastedsaint").hexdigest()
+        result = rc.get(rediskeyfeastedsaint)
+        if format == "json":
+          web.header('Content-Type', 'application/json')
+          return json.dumps({"feastedsaint": result})
         else:
           return result
 
