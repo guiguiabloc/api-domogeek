@@ -1305,7 +1305,7 @@ class ejpedf:
           return result
 
 """
-@api {get} /feastedsaint/:date or :name/:responsetype Feasted Day of Saint Request
+@api {get} /feastedsaint/:date/:responsetype Feasted Day of Saint Request
 @apiName GetFeastedSaintDay
 @apiGroup Domogeek
 @apiDescription Ask to know feasted Saint for :date or date for :name
