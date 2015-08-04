@@ -1274,7 +1274,7 @@ class ejpedf:
             result = getejptoday
             print "FOUND EJP "+zoneok+ " TODAY IN REDIS"
         except:
-            result = ejprequest.EJPToday()
+            result = ejprequest.EJPToday(zoneok)
 
         if format == "json":
           web.header('Content-Type', 'application/json')
@@ -1296,7 +1296,7 @@ class ejpedf:
             result = getejptomorrow
             print "FOUND EJP "+zoneok+ " TOMORROW IN REDIS"
         except:
-            result = ejprequest.EJPTomorrow()
+            result = ejprequest.EJPTomorrow(zoneok)
 
         if format == "json":
           web.header('Content-Type', 'application/json')

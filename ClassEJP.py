@@ -6,73 +6,112 @@
 # http://api.domogeek.fr
 #
 
-# NEED http://www.crummy.com/software/BeautifulSoup/
-
-# EDF website url
-#https://particuliers.edf.com/gestion-de-mon-contrat/options-tarifaires/option-ejp/l-observatoire-2584.html
-
-import urllib
-from urllib2 import urlopen
+import urllib2
 import sys
-import bs4 as BeautifulSoup
+import json
+
+url="https://particulier.edf.fr/bin/edf_rc/servlets/ejptempo?searchType=ejp"
 
 class EDFejp:
-  def __init__(self):
-    self.ejpoui = "/FRONT/NetExpress/img/ejp_oui.png"
-    self.ejpnon = "/FRONT/NetExpress/img/ejp_non.png"
-    self.ejpnd = "/FRONT/NetExpress/img/ejp_nd.png"
-
 
   def EJPToday(self,request):
+    print "RECU REQUETE: " +request
     try:
-      html = urlopen('https://particuliers.edf.com/gestion-de-mon-contrat/options-tarifaires/option-ejp/l-observatoire-2584.html').read()
-      soup = BeautifulSoup.BeautifulSoup(html)
+      html = urllib2.urlopen(url)
     except:
       return None
-
-    dumptoday = soup.findAll('table', attrs={"class":u"w_skinnedTable reacapEJPDay"})[1]
-    for x in dumptoday :
-      if request == "nord" :
-        result= soup.find('td', attrs={"headers":u"tabEJP1_1-h2 tabEJP1_1-l1"})
-      if request == "sud":
-        result = soup.find('td', attrs={"headers":u"tabEJP1_1-h5 tabEJP1_1-l1"})
-      if request == "ouest":
-        result = soup.find('td', attrs={"headers":u"tabEJP1_1-h4 tabEJP1_1-l1"})
-      if request == "paca":
-        result = soup.find('td', attrs={"headers":u"tabEJP1_1-h3 tabEJP1_1-l1"})
-      if self.ejpoui in str(result):
+    try:
+      rep = json.load(html)
+    except:
+      return None
+    data = rep["data"]
+    try:
+      d = json.loads(data)
+    except:
+      return None
+    info_ejp=d['dtos']
+    result = None
+    lst = []
+    for i in info_ejp:
+      d=i['dates'][0]
+      v=i['values'][0]
+      r=i['region']
+      liste = {}
+      liste[r]=v
+      lst.append(liste)
+    resultat = json.dumps(lst)
+    NORD = lst[0]['EJP_NORD']
+    OUEST = lst[1]['EJP_OUEST']
+    PACA = lst[2]['EJP_PACA']
+    SUD = lst[3]['EJP_SUD']
+    print NORD, OUEST, PACA, SUD
+    if request == "nord":
+        result= NORD
+    if request == "sud":
+        result = SUD
+    if request == "ouest":
+        result = OUEST
+    if request == "paca":
+        result = PACA
+    print result
+    if "OUI" in str(result):
         return "True"
-      elif self.ejpnon in str(result):
+    elif "NON" in str(result):
         return "False"
-      elif self.ejpnd in str(result):
+    elif "ND" in str(result):
         return "ND"
-      else:
+    else:
         return "no data"
-      break
 
   def EJPTomorrow(self,request):
+    print "RECU REQUETE: " +request
     try:
-      html = urlopen('https://particuliers.edf.com/gestion-de-mon-contrat/options-tarifaires/option-ejp/l-observatoire-2584.html').read()
-      soup = BeautifulSoup.BeautifulSoup(html)
+      html = urllib2.urlopen(url)
     except:
       return None
-
-    dumptoday = soup.findAll('table', attrs={"class":u"w_skinnedTable reacapEJPDay"})[0]
-    for x in dumptoday :
-      if request == "nord" :
-        result= soup.find('td', attrs={"headers":u"tabEJP2_1-h2 tabEJP2_1-l1"})
-      if request == "sud":
-        result = soup.find('td', attrs={"headers":u"tabEJP2_1-h5 tabEJP2_1-l1"})
-      if request == "ouest":
-        result = soup.find('td', attrs={"headers":u"tabEJP2_1-h4 tabEJP2_1-l1"})
-      if request == "paca":
-        result = soup.find('td', attrs={"headers":u"tabEJP2_1-h3 tabEJP2_1-l1"})
-      if self.ejpoui in str(result):
+    try:
+      rep = json.load(html)
+    except:
+      return None
+    data = rep["data"]
+    try:
+      d = json.loads(data)
+    except:
+      return None
+    info_ejp=d['dtos']
+    result = None
+    lst = []
+    for i in info_ejp:
+      try:
+        d_tomorrow=i['dates'][1]
+        v_tomorrow=i['values'][1]
+        r=i['region']
+        liste = {}
+        liste[r]=v
+        lst.append(liste)
+        resultat = json.dumps(lst)
+      except:
+        return "no value"
+    NORD = lst[0]['EJP_NORD']
+    OUEST = lst[1]['EJP_OUEST']
+    PACA = lst[2]['EJP_PACA']
+    SUD = lst[3]['EJP_SUD']
+    print NORD, OUEST, PACA, SUD
+    if request == "nord":
+        result= NORD
+    if request == "sud":
+        result = SUD
+    if request == "ouest":
+        result = OUEST
+    if request == "paca":
+        result = PACA
+    print result
+    if "OUI" in str(result):
         return "True"
-      elif self.ejpnon in str(result):
+    elif "NON" in str(result):
         return "False"
-      elif self.ejpnd in str(result):
+    elif "ND" in str(result):
         return "ND"
-      else:
+    else:
         return "no data"
-      break
+
