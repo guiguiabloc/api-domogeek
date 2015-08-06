@@ -21,6 +21,10 @@ import ClassDawnDusk
 import ClassWeather
 import ClassEJP
 
+# timeout in seconds
+timeout = 10
+socket.setdefaulttimeout(timeout)
+
 school = ClassSchoolCalendar.schoolcalendar()
 dayrequest = Holiday.jourferie()
 temporequest = ClassTempo.EDFTempo()
