@@ -1,0 +1,15 @@
+{
+    "config":{
+        "listenip":"127.0.0.1",
+        "listenport":80,        
+        "localapiurl":"http://api.domogeek.fr",
+        "googleapikey":"",
+        "bingmapapikey":"",
+        "geonameskey":"",
+        "worldweatheronlineapikey":"",
+        "redis":{
+            "host":"127.0.0.1",
+            "port":6379
+        }
+    }
+}
