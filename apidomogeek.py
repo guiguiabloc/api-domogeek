@@ -7,8 +7,8 @@
 #
 
 import web, sys, time
-import json,hashlib,socket
-from datetime import datetime,date,timedelta
+import json, hashlib, socket
+from datetime import datetime, date, timedelta
 import urllib, urllib2
 from Daemon import Daemon
 from xml.dom.minidom import parseString
@@ -38,16 +38,10 @@ ejprequest = ClassEJP.EDFejp()
 # CONFIG #
 ##########
 
-listenip = "0.0.0.0"
-listenport = "80"
-localapiurl= "http://api.domogeek.fr"
-googleapikey = ''
-bingmapapikey = ''
-geonameskey = ''
-worldweatheronlineapikey = ''
+with open('config.json') as jsonConfigFile:
+    config = json.load(jsonConfigFile)
 
-redis_host =  "127.0.0.1"
-redis_port =  6379
+localapiurl = config['config']['localapiurl']
 
 ##############
 # END CONFIG #
@@ -57,37 +51,37 @@ redis_port =  6379
 # Test REDIS #
 ##############
 try:
- import redis
+    import redis
 except:
-  print "No Redis module : https://pypi.python.org/pypi/redis/"
-  sys.exit(1)
+    print "No Redis module : https://pypi.python.org/pypi/redis/"
+    sys.exit(1)
 
-rc= redis.Redis(host=redis_host, port=redis_port)
+rc = redis.Redis(host=config['config']['redis']['host'], port=config['config']['redis']['port'])
 rc.set("test", "ok")
-rc.expire("test" ,10)
+rc.expire("test", 10)
 value = rc.get("test")
 if value is None:
-  print "Could not connect to  Redis  " + redis_host + " port " + redis_port
+    print "Could not connect to  Redis  " + config['config']['redis']['host'] + " port " + config['config']['redis']['port']
 
 
 web.config.debug = False
 
 
 urls = (
-  '/holiday/(.*)', 'holiday',
-  '/tempoedf/(.*)', 'tempoedf',
-  '/ejpedf/(.*)', 'ejpedf',
-  '/schoolholiday/(.*)', 'schoolholiday',
-  '/weekend/(.*)', 'weekend',
-  '/holidayall/(.*)', 'holidayall',
-  '/vigilance/(.*)', 'vigilance',
-  '/geolocation/(.*)', 'geolocation',
-  '/sun/(.*)', 'dawndusk',
-  '/weather/(.*)', 'weather',
-  '/season(.*)', 'season',
-  '/myip(.*)', 'myip',
-  '/feastedsaint/(.*)', 'feastedsaint',
-  '/', 'index'
+    '/holiday/(.*)', 'holiday',
+    '/tempoedf/(.*)', 'tempoedf',
+    '/ejpedf/(.*)', 'ejpedf',
+    '/schoolholiday/(.*)', 'schoolholiday',
+    '/weekend/(.*)', 'weekend',
+    '/holidayall/(.*)', 'holidayall',
+    '/vigilance/(.*)', 'vigilance',
+    '/geolocation/(.*)', 'geolocation',
+    '/sun/(.*)', 'dawndusk',
+    '/weather/(.*)', 'weather',
+    '/season(.*)', 'season',
+    '/myip(.*)', 'myip',
+    '/feastedsaint/(.*)', 'feastedsaint',
+    '/', 'index'
 )
 
 app = web.application(urls, globals())
@@ -127,72 +121,72 @@ class index:
 
 """
 class holiday:
-    def GET(self,uri):
-      request = uri.split('/')
-      if request == ['']:
-        web.badrequest()
-        return "Incorrect request : /holiday/{now|tomorrow|date(D-M-YYYY)}\n"
-      try:
-        format = request[1]
-      except:
-        format = None
-      if request[0] == "now":
-        datenow = datetime.now()
-        year = datenow.year
-        month = datenow.month
-        day = datenow.day 
-        result = dayrequest.estferie([day,month,year])
-        if format == "json":
-          web.header('Content-Type', 'application/json')
-          return json.dumps({"holiday": result})
-        else:
-          return result
-      if request[0] == "tomorrow":
-        datenow = datetime.now()
-        datetomorrow = datenow + timedelta(days=1)
-        year = datetomorrow.year
-        month = datetomorrow.month
-        day = datetomorrow.day
-        result = dayrequest.estferie([day,month,year])
-        if format == "json":
-          web.header('Content-Type', 'application/json')
-          return json.dumps({"holiday": result})
-        else:
-          return result
-      if request[0] == "all":
-        datenow = datetime.now()
-        year = datenow.year
-        listvalue = []
-        F, J, L = dayrequest.joursferies(year,1,'/')
-        for i in xrange(0,len(F)):
-          result = F[i], "%10s" % (J[i]), L[i]
-          listvalue.append(result)
-          response = json.dumps(listvalue)
-        return response
+    def GET(self, uri):
+        request = uri.split('/')
+        if request == ['']:
+            web.badrequest()
+            return "Incorrect request : /holiday/{now|tomorrow|date(D-M-YYYY)}\n"
+        try:
+            format = request[1]
+        except:
+            format = None
+        if request[0] == "now":
+            datenow = datetime.now()
+            year = datenow.year
+            month = datenow.month
+            day = datenow.day
+            result = dayrequest.estferie([day, month, year])
+            if format == "json":
+                web.header('Content-Type', 'application/json')
+                return json.dumps({"holiday": result})
+            else:
+                return result
+        if request[0] == "tomorrow":
+            datenow = datetime.now()
+            datetomorrow = datenow + timedelta(days=1)
+            year = datetomorrow.year
+            month = datetomorrow.month
+            day = datetomorrow.day
+            result = dayrequest.estferie([day, month, year])
+            if format == "json":
+                web.header('Content-Type', 'application/json')
+                return json.dumps({"holiday": result})
+            else:
+                return result
+        if request[0] == "all":
+            datenow = datetime.now()
+            year = datenow.year
+            listvalue = []
+            F, J, L = dayrequest.joursferies(year, 1, '/')
+            for i in xrange(0, len(F)):
+                result = F[i], "%10s" % (J[i]), L[i]
+                listvalue.append(result)
+                response = json.dumps(listvalue)
+            return response
 
-      if request[0] != "now" and request[0] != "all" and request[0] != "tomorrow":
-        try:
-          daterequest = request[0]
-          result = daterequest.split('-') 
-        except:
-          web.badrequest()
-          return "Incorrect date format : D-M-YYYY\n"
-        try:
-          day = int(result[0])
-          month = int(result[1])
-          year = int(result[2])
-        except:
-          web.badrequest()
-          return "Incorrect date format : D-M-YYYY\n"
-        if day > 31 or month > 12:
-          web.badrequest()
-          return "Incorrect date format : D-M-YYYY\n"
-        result = dayrequest.estferie([day,month,year])
-        if format == "json":
-          web.header('Content-Type', 'application/json')
-          return json.dumps({"holiday": result})
-        else:
-          return result
+        if request[0] != "now" and request[0] != "all" and request[0] != "tomorrow":
+            try:
+                daterequest = request[0]
+                result = daterequest.split('-')
+            except:
+                web.badrequest()
+                return "Incorrect date format : D-M-YYYY\n"
+            try:
+                day = int(result[0])
+                month = int(result[1])
+                year = int(result[2])
+            except:
+                web.badrequest()
+                return "Incorrect date format : D-M-YYYY\n"
+            if day > 31 or month > 12:
+                web.badrequest()
+                return "Incorrect date format : D-M-YYYY\n"
+                result = dayrequest.estferie([day, month, year])
+            if format == "json":
+                web.header('Content-Type', 'application/json')
+                return json.dumps({"holiday": result})
+            else:
+                return result
 
 
 """
@@ -770,11 +764,11 @@ class geolocation:
       except:
         pass
 
-      if googleapikey == '' or inredis == "ok":
+      if config['config']['googleapikey'] == '' or inredis == "ok":
         pass
       else:
         try:
-          data = geolocationrequest.geogoogle(city, googleapikey)
+          data = geolocationrequest.geogoogle(city, config['config']['googleapikey'])
           checkgoogle = True
           rediskey =  hashlib.md5(city).hexdigest()
           rc.set(rediskey, (data[0], data[1]))
@@ -783,14 +777,14 @@ class geolocation:
         except:
           print "NO VALUE FROM GOOGLE"
 
-      if bingmapapikey == '' or inredis == "ok":
+      if config['config']['bingmapapikey'] == '' or inredis == "ok":
         pass
       else:
         if checkgoogle:
           pass
         else:
           try:
-            data = geolocationrequest.geobing(city, bingmapapikey)
+            data = geolocationrequest.geobing(city, config['config']['bingmapapikey'])
           except:
             print "NO VALUE FROM BING"
             data = False
@@ -803,14 +797,14 @@ class geolocation:
             web.header('Content-Type', 'application/json')
             return json.dumps({"latitude": data[0], "longitude": data[1]})
 
-      if geonameskey == '' or inredis == "ok":
+      if config['config']['geonameskey'] == '' or inredis == "ok":
         pass
       else:
         if checkbing:
           pass
         else:
           try:
-            data = geolocationrequest.geonames(city, geonameskey)
+            data = geolocationrequest.geonames(city, config['config']['geonameskey'])
           except:
             print "NO VALUE FROM GEONAMES"
             data = False
@@ -1052,7 +1046,7 @@ class weather:
           rediskeytodayrain = hashlib.md5(str(latitude)+str(longitude)+str(datetoday)).hexdigest()
           gettodayrain = rc.get(rediskeytodayrain)
           if gettodayrain is None:
-            todayrain = weatherrequest.getrain(latitude, longitude, worldweatheronlineapikey, datetoday)
+            todayrain = weatherrequest.getrain(latitude, longitude, config['config']['worldweatheronlineapikey'], datetoday)
             rediskeytodayrain = hashlib.md5(str(latitude)+str(longitude)+str(datetoday)).hexdigest()
             rc.set(rediskeytodayrain, todayrain)
             rc.expire(rediskeytodayrain, 3600)
@@ -1061,7 +1055,7 @@ class weather:
             todayrain = gettodayrain
             print "FOUND RAIN IN REDIS"
         except:
-          todayrain = weatherrequest.getrain(latitude, longitude, worldweatheronlineapikey, datetoday)
+          todayrain = weatherrequest.getrain(latitude, longitude, config['config']['worldweatheronlineapikey'], datetoday)
         if weatherrequestelement != "all" or weatherrequestelement != "temperature" or weatherrequestelement != "weather":
           if format == "json":
               web.header('Content-Type', 'application/json')
@@ -1090,7 +1084,7 @@ class weather:
           rediskeytomorrowrain = hashlib.md5(str(latitude)+str(longitude)+str(datetomorrow)).hexdigest()
           gettomorrowrain = rc.get(rediskeytomorrowrain)
           if gettomorrowrain is None:
-            tomorrowrain = weatherrequest.getrain(latitude, longitude, worldweatheronlineapikey, datetomorrow)
+            tomorrowrain = weatherrequest.getrain(latitude, longitude, config['config']['worldweatheronlineapikey'], datetomorrow)
             rediskeytomorrowrain = hashlib.md5(str(latitude)+str(longitude)+str(datetomorrow)).hexdigest()
             rc.set(rediskeytomorrowrain, tomorrowrain)
             rc.expire(rediskeytomorrowrain, 3600)
@@ -1099,7 +1093,7 @@ class weather:
             tomorrowrain = gettomorrowrain
             print "FOUND RAIN IN REDIS"
         except:
-          tomorrowrain = weatherrequest.getrain(latitude, longitude, worldweatheronlineapikey, datetomorrow)
+          tomorrowrain = weatherrequest.getrain(latitude, longitude, config['config']['worldweatheronlineapikey'], datetomorrow)
         if weatherrequestelement != "all" or weatherrequestelement != "temperature" or weatherrequestelement != "weather":
           if format == "json":
               web.header('Content-Type', 'application/json')
@@ -1417,16 +1411,15 @@ if __name__ == "__main__":
         service = MyDaemon('/tmp/apidomogeek.pid')
         if len(sys.argv) == 2:
                 if 'start' == sys.argv[1]:
-                        sys.argv[1] =  listenip+':'+listenport
+                        sys.argv[1] =  str(config['config']['listenip'])+':'+str(config['config']['listenport'])
                         service.start()
                 elif 'stop' == sys.argv[1]:
                         service.stop()
                 elif 'restart' == sys.argv[1]:
                         service.restart()
                 elif 'console' == sys.argv[1]:
-                        sys.argv[1] =  listenip+':'+listenport
+                        sys.argv[1] =  str(config['config']['listenip'])+':'+str(config['config']['listenport'])
                         service.console()
-
                 else:
                         print "Unknown command"
                         sys.exit(2)
