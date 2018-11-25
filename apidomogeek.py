@@ -897,9 +897,7 @@ class dawndusk:
           longitude =  resultgeolocation["longitude"]
         else:
           print "FOUND LOCATION IN REDIS !!!"
-          tr1 =  getlocation.replace("(","")
-          tr2 = tr1.replace(")","")
-          data = tr2.split(',')
+          data = getlocation.split(',')
           latitude = float(data[0])
           longitude = float(data[1])
       except:
