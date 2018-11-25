@@ -62,7 +62,8 @@ class schoolcalendar:
            listvalue.append([stringconvertstart, description,stringconvertend]) 
         else:
            listvalue.append([stringconvertstart, description]) 
-     return str(listvalue)
+     #return str(listvalue)
+     return listvalue
 
   def isschoolcalendar(self,zone,day,month,year):
     try:
