@@ -582,7 +582,7 @@ class schoolholiday:
         except:
           description = result
         web.header('Content-Type', 'application/json')
-        return description
+        return json.dumps(description)
       if daterequest != "now" and daterequest != "all" and daterequest != "tomorrow":
         try:
           result = daterequest.split('-')
