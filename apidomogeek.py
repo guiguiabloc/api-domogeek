@@ -755,9 +755,7 @@ class geolocation:
         else:
           print "FOUND LOCATION IN REDIS !!!"
           inredis = "ok"
-          tr1 =  getlocation.replace("(","")
-          tr2 = tr1.replace(")","")
-          data = tr2.split(',')
+          data = getlocation.split(',')
           web.header('Content-Type', 'application/json')
           return json.dumps({"latitude": float(data[0]), "longitude": float(data[1])})
 
@@ -771,9 +769,11 @@ class geolocation:
           data = geolocationrequest.geogoogle(city, config['config']['googleapikey'])
           checkgoogle = True
           rediskey =  hashlib.md5(city).hexdigest()
-          rc.set(rediskey, (data[0], data[1]))
+          rc.set(rediskey, data[0])
+          rc.append(rediskey ,',')
+          rc.append(rediskey ,data[1])
           web.header('Content-Type', 'application/json')
-          return json.dumps({"latitude": data[0], "longitude": data[1]})
+          return json.dumps({"latitude": float(data[0]), "longitude": float(data[1])})
         except:
           print "NO VALUE FROM GOOGLE"
 
@@ -793,9 +793,11 @@ class geolocation:
           else:
             checkbing = True
             rediskey =  hashlib.md5(city).hexdigest()
-            rc.set(rediskey, (data[0], data[1]))
+            rc.set(rediskey, data[0])
+            rc.append(rediskey ,',')
+            rc.append(rediskey ,data[1])
             web.header('Content-Type', 'application/json')
-            return json.dumps({"latitude": data[0], "longitude": data[1]})
+            return json.dumps({"latitude": float(data[0]), "longitude": float(data[1])})
 
       if config['config']['geonameskey'] == '' or inredis == "ok":
         pass
@@ -813,9 +815,11 @@ class geolocation:
           else:
             checkgeonames = True
             rediskey =  hashlib.md5(city).hexdigest()
-            rc.set(rediskey, (data[0], data[1]))
+            rc.set(rediskey, data[0])
+            rc.append(rediskey ,',')
+            rc.append(rediskey ,data[1])
             web.header('Content-Type', 'application/json')
-            return json.dumps({"latitude": data[0], "longitude": data[1]})
+            return json.dumps({"latitude": float(data[0]), "longitude": float(data[1])})
 
       if not checkgoogle and not checkbing and not checkgeonames and not inredis:
          return "NO GEOLOCATION DATA AVAILABLE\n"
