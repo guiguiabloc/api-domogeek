@@ -6,6 +6,7 @@
         "googleapikey":"",
         "bingmapapikey":"",
         "geonameskey":"",
+        "openweathermapapikey":"",
         "worldweatheronlineapikey":"",
         "redis":{
             "host":"127.0.0.1",
