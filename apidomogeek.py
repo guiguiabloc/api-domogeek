@@ -1041,7 +1041,7 @@ class weather:
       except:
         return "no data available"
       if request[2] == "today":
-        todayweather = weatherrequest.todayopenweathermap(latitude, longitude, weatherrequestelement)
+        todayweather = weatherrequest.todayopenweathermap(latitude, longitude, weatherrequestelement, config['config']['openweathermapapikey'])
         datenow = datetime.now()
         datetoday = datenow.strftime('%Y-%m-%d')
         try:
@@ -1073,12 +1073,14 @@ class weather:
              if weatherrequestelement == "rain":
                return todayrain
              else:
-               return todayweather
+               web.header('Content-Type', 'application/json')
+               return json.dumps(todayweather)
         else:
-            return todayweather
+            web.header('Content-Type', 'application/json')
+            return json.dumps(todayweather)
  
       if request[2] == "tomorrow":
-        tomorrowweather = weatherrequest.tomorrowopenweathermap(latitude, longitude, weatherrequestelement)
+        tomorrowweather = weatherrequest.tomorrowopenweathermap(latitude, longitude, weatherrequestelement, config['config']['openweathermapapikey'])
         datenow = datetime.now()
         tomorrow =  datenow + timedelta(days=1)
         datetomorrow = tomorrow.strftime('%Y-%m-%d')
@@ -1111,9 +1113,11 @@ class weather:
             if weatherrequestelement == "rain":
               return tomorrowrain
             else:
-              return tomorrowweather
+              web.header('Content-Type', 'application/json')
+              return json.dumps(tomorrowweather)
         else:
-           return tomorrowweather
+          web.header('Content-Type', 'application/json')
+          return json.dumps(tomorrowweather)
 
 """
 @api {get} /myip/:responsetype Display Public IP
