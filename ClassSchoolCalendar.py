@@ -76,7 +76,8 @@ class schoolcalendar:
     if zoneok not in ["A","B","C"]:
       return "Wrong Zone (must be A, B or C)"
     else :
-     URL = "http://media.education.gouv.fr/ics/Calendrier_Scolaire_Zone_"+zoneok+".ics"
+     #URL = "http://media.education.gouv.fr/ics/Calendrier_Scolaire_Zone_"+zoneok+".ics"
+     URL = "https://fr.ftp.opendatasoft.com/openscol/fr-en-calendrier-scolaire/Zone-"+zoneok+".ics"
      try:
        ics = urlopen(URL)
        cal = Calendar.from_ical(ics.read())
