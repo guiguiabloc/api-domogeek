@@ -68,9 +68,9 @@ class sunriseClass:
 	def getHM(self,nH):
 		h=int(nH)
 		m=int(((nH*60.0)%60)+0.5)
-                if m == 60 :
-                   m = 00
-                   h = h + 1
+		if m == 60 :
+				m = 00
+				h = h + 1
 		return '%d:%02d' % (h,m)
 	def calculateWithUTC(self,UTC):
 		mLon=(self.longitude*4.0)/60.0

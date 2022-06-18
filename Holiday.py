@@ -10,7 +10,7 @@ Source : Les recettes Python de Tyrtamos
 class jourferie:
 
   def datepaques(self,an):
-      """Calcule la date de Pâques d'une année donnée an (=nombre entier)"""
+      """Calcule la date de PÃ¢ques d'une annÃ©e donnÃ©e an (=nombre entier)"""
       a=an//100
       b=an%100
       c=(3*(a+25))//4
@@ -29,22 +29,22 @@ class jourferie:
       return [jour, mois, an]
   
   def dateliste(self,c, sep='/'):
-      """Transforme une date chaîne 'j/m/a' en une date liste [j,m,a]"""
+      """Transforme une date chaÃ®ne 'j/m/a' en une date liste [j,m,a]"""
       j, m, a = c.split(sep)
       return [int(j), int(m), int(a)]
   
   def datechaine(self,d, sep='/'):
-      """Transforme une date liste=[j,m,a] en une date chaîne 'jj/mm/aaaa'"""
+      """Transforme une date liste=[j,m,a] en une date chaÃ®ne 'jj/mm/aaaa'"""
       return ("%02d" + sep + "%02d" + sep + "%0004d") % (d[0], d[1], d[2])
   
   
   def jourplus(self,d, n=1):
-      """Donne la date du nième jour suivant d=[j, m, a] (n>=0)"""
+      """Donne la date du niÃ¨me jour suivant d=[j, m, a] (n>=0)"""
       j, m, a = d
       fm = [0,31,28,31,30,31,30,31,31,30,31,30,31]
       if (a%4==0 and a%100!=0) or a%400==0:  # bissextile?
           fm[2] = 29
-      for i in xrange(0,n):
+      for i in range(0,n):
           j += 1
           if j > fm[m]:
               j = 1
@@ -55,12 +55,12 @@ class jourferie:
       return [j,m,a]
   
   def jourmoins(self,d, n=-1):
-      """Donne la date du nième jour précédent d=[j, m, a] (n<=0)"""
+      """Donne la date du niÃ¨me jour prÃ©cÃ©dent d=[j, m, a] (n<=0)"""
       j, m, a = d
       fm = [0,31,28,31,30,31,30,31,31,30,31,30,31]
       if (a%4==0 and a%100!=0) or a%400==0:  # bissextile?
           fm[2] = 29
-      for i in xrange(0,abs(n)):
+      for i in range(0,abs(n)):
           j -= 1
           if j < 1:
               m -= 1
@@ -72,7 +72,7 @@ class jourferie:
   
   
   def numjoursem(self,d):
-      """Donne le numéro du jour de la semaine d'une date d=[j,m,a]
+      """Donne le numÃ©ro du jour de la semaine d'une date d=[j,m,a]
          lundi=1, mardi=2, ..., dimanche=7
          Algorithme de Maurice Kraitchik (1882?1957)"""
       j, m, a = d
@@ -83,16 +83,16 @@ class jourferie:
       return [6, 7, 1, 2, 3, 4, 5][n]
    
   def joursem(self,d):
-      """Donne le jour de semaine en texte à partir de son numéro
+      """Donne le jour de semaine en texte Ã© partir de son numÃ©ro
          lundi=1, mardi=2, ..., dimanche=7"""
       return ["", "lundi", "mardi", "mercredi", "jeudi", "vendredi", "samedi",
                "dimanche"][self.numjoursem(d)]
   
   def joursferiesliste(self,an, sd=0):
-      """Liste des jours fériés France en date-liste de l'année an (nb entier). 
-           sd=0 (=defaut): tous les jours fériés. 
+      """Liste des jours fÃ©riÃ©s France en date-liste de l'annÃ©e an (nb entier). 
+           sd=0 (=defaut): tous les jours fÃ©riÃ©s. 
            sd=1: idem sans les sammedis-dimanches. 
-           sd=2: tous + les 2 jours fériés supplémentaires d'Alsace-Moselle. 
+           sd=2: tous + les 2 jours fÃ©riÃ©s supplÃ©mentaires d'Alsace-Moselle. 
            sd=3: idem sd=2 sans les samedis-dimanches"""
       F = []  # =liste des dates des jours feries en date-liste d=[j,m,a]
       L = []  # =liste des libelles du jour ferie
@@ -123,7 +123,7 @@ class jourferie:
       F.append(d)
       L.append(u"Lundi de Paques")
    
-      # Fête du travail
+      # FÃ©te du travail
       d = [1,5,an]
       nj = self.numjoursem(d)
       if (sd==0) or (sd==1 and nj<6) or (sd==2) or (sd==3 and nj<6):
@@ -198,26 +198,26 @@ class jourferie:
       return F, L
   
   def joursferies(self,an, sd=0, sep='/'):
-      """Liste des jours fériés France en date-chaine de l'année an (nb entier). 
-           sd=0 (=defaut): tous les jours fériés. 
+      """Liste des jours fÃ©riÃ©s France en date-chaine de l'annÃ©e an (nb entier). 
+           sd=0 (=defaut): tous les jours fÃ©riÃ©s. 
            sd=1: idem sans les sammedis-dimanches. 
-           sd=2: tous + les 2 jours fériés supplémentaires d'Alsace-Moselle. 
+           sd=2: tous + les 2 jours fÃ©riÃ©s supplÃ©mentaires d'Alsace-Moselle. 
            sd=3: idem sd=2 sans les samedis-dimanches"""
       C = []
       J = []
       F, L = self.joursferiesliste(an, sd)
-      for i in xrange(0,len(F)):
+      for i in range(0,len(F)):
           C.append(self.datechaine(F[i]))  # conversion des dates-liste en dates-chaine
           J.append(self.joursem(F[i]))  # ajout du jour de semaine
       return C, J, L
   
   def estferie(self,d,sd=0):
-      """estferie(d,sd=0): => dit si une date d=[j,m,a] donnée est fériée France
-         si la date est fériée, renvoie son libellé
+      """estferie(d,sd=0): => dit si une date d=[j,m,a] donnÃ©e est fÃ©riÃ©e France
+         si la date est fÃ©riÃ©e, renvoie son libellÃ©
          sinon, renvoie une chaine vide"""
       j,m,a = d
       F, L = self.joursferiesliste(a, sd)
-      for i in xrange(0, len(F)):
+      for i in range(0, len(F)):
           if j==F[i][0] and m==F[i][1] and a==F[i][2]:
               return L[i]
       return "False"    

@@ -9,7 +9,7 @@
 #
 
 from __future__ import unicode_literals
-from urllib import urlopen
+from urllib.request import urlopen
 from icalendar import Calendar, Event
 from datetime import datetime 
 from datetime import date 
@@ -29,7 +29,6 @@ class schoolcalendar:
     else :
      #URL = "http://media.education.gouv.fr/ics/Calendrier_Scolaire_Zone_"+zoneok+".ics"
      URL = "https://fr.ftp.opendatasoft.com/openscol/fr-en-calendrier-scolaire/Zone-"+zoneok+".ics"
-
      try:
        ics = urlopen(URL)
        cal = Calendar.from_ical(ics.read())
@@ -97,7 +96,7 @@ class schoolcalendar:
 
      for event in cal.walk('vevent'):
         start = event.get('dtstart')
-        convertstart = start.to_ical()
+        convertstart = start.to_ical().decode("utf-8")
         stringconvertstart= str(convertstart)
         startdecode = time.strptime(str(convertstart), '%Y%m%d')
         end =  event.get('dtend')
@@ -126,7 +125,7 @@ class schoolcalendar:
             return str(description)
               
         if end:
-           convertend = end.to_ical()
+           convertend = end.to_ical().decode("utf-8")
            enddecode = time.strptime(str(convertend), '%Y%m%d')
            stringconvertend= str(convertend)
            yearend = enddecode[0]

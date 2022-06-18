@@ -20,7 +20,7 @@ rc.set("test", "ok")
 rc.expire("test" ,10)
 value = rc.get("test")
 if value is None:
-  print "Could not connect to  Redis  " + redis_host + " port " + redis_port
+  print ("Could not connect to  Redis  " + redis_host + " port " + redis_port)
   sys.exit(0) 
 
 class TransformCSV(csv.Dialect):
@@ -33,12 +33,14 @@ class TransformCSV(csv.Dialect):
     skipinitialspace = False
 
 file = open("saintlist.csv", "rb")
+print (file)
 reader = csv.reader(file, TransformCSV())
+print (reader)
 
 def insertsaintdate():
   for row in reader:
       nameentry = row[0]
-      dayentry = row [1] 
+      dayentry = row [1]
       monthentry = row [2]
       group = dayentry+"-"+monthentry
       rediskeyfeastedsaint = hashlib.md5(group+"feastedsaint").hexdigest()
@@ -57,7 +59,7 @@ def insertsaintname():
       monthentry = element[2]
       group = dayentry+"-"+monthentry
       rediskeynamefeastedsaint = hashlib.md5(nameentryok+"feastedsaint").hexdigest()
-      print "NAME : "+nameentryok+ "HASH : "+rediskeynamefeastedsaint
+      print ("NAME : "+nameentryok+ "HASH : "+rediskeynamefeastedsaint)
       rc.set(rediskeynamefeastedsaint, group)
 
 ###################

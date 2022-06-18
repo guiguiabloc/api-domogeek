@@ -6,7 +6,7 @@
 # http://api.domogeek.fr
 #
 
-import urllib2
+import urllib3
 import sys
 import json
 
@@ -15,9 +15,9 @@ url="https://particulier.edf.fr/bin/edf_rc/servlets/ejptempo?searchType=ejp"
 class EDFejp:
 
   def EJPToday(self,request):
-    print "RECU REQUETE: " +request
+    print ("RECU REQUETE: " +request)
     try:
-      html = urllib2.urlopen(url)
+      html = urllib3.urlopen(url)
     except:
       return None
     try:
@@ -44,7 +44,7 @@ class EDFejp:
     OUEST = lst[1]['EJP_OUEST']
     PACA = lst[2]['EJP_PACA']
     SUD = lst[3]['EJP_SUD']
-    print NORD, OUEST, PACA, SUD
+    print (NORD, OUEST, PACA, SUD)
     if request == "nord":
         result= NORD
     if request == "sud":
@@ -53,7 +53,7 @@ class EDFejp:
         result = OUEST
     if request == "paca":
         result = PACA
-    print result
+    print (result)
     if "OUI" in str(result):
         return "True"
     elif "NON" in str(result):
@@ -64,9 +64,9 @@ class EDFejp:
         return "no data"
 
   def EJPTomorrow(self,request):
-    print "RECU REQUETE: " +request
+    print ("RECU REQUETE: " +request)
     try:
-      html = urllib2.urlopen(url)
+      html = urllib3.urlopen(url)
     except:
       return None
     try:
@@ -96,7 +96,7 @@ class EDFejp:
     OUEST = lst[1]['EJP_OUEST']
     PACA = lst[2]['EJP_PACA']
     SUD = lst[3]['EJP_SUD']
-    print NORD, OUEST, PACA, SUD
+    print (NORD, OUEST, PACA, SUD)
     if request == "nord":
         result= NORD
     if request == "sud":
@@ -105,7 +105,7 @@ class EDFejp:
         result = OUEST
     if request == "paca":
         result = PACA
-    print result
+    print (result)
     if "OUI" in str(result):
         return "True"
     elif "NON" in str(result):

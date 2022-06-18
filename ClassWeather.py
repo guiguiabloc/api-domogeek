@@ -6,7 +6,7 @@
 # http://api.domogeek.fr
 #
 
-import urllib,urllib2
+import urllib,urllib3
 import json
 
 class weather:
