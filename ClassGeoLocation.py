@@ -43,7 +43,7 @@ class geolocation:
        latitude = coord[0][0]
        longitude = coord[0][1]
        return latitude,longitude
-  
+
   def geonames(self, addr, api_key):
        url = "http://api.geonames.org/search?q=%s&maxRows=1&username=%s" % (urllib.quote(addr), urllib.quote(api_key))
        try:
@@ -56,4 +56,4 @@ class geolocation:
        latitude=latTag.replace('<lat>','').replace('</lat>','')
        longitude=lngTag.replace('<lng>','').replace('</lng>','')
        return latitude,longitude
-        
+

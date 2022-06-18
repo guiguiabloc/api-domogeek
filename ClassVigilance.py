@@ -52,7 +52,7 @@ class vigilance:
               floodresult = flood.attributes['valeur'].value
          riskresult = risklong(riskresult)
          floodresult = color(floodresult)
-         if not riskresult: 
+         if not riskresult:
            riskresult = "RAS"
          if depart == deprequest:
            color = color(colorresult)

@@ -32,7 +32,7 @@ class weather:
           if request == "windspeed":
             return windspeed
           if request == "all":
-            return dataopenweathermap['list'][0] 
+            return dataopenweathermap['list'][0]
           else:
             return None
         except:
@@ -65,11 +65,11 @@ class weather:
           return "no data"
   def getrain(self, lat, lng, api_key, date):
         url = "http://api.worldweatheronline.com/free/v1//weather.ashx?q=%s,%s&key=%s&format=json&date=%s&includeLocation=no" % (urllib.quote(str(lat)), urllib.quote(str(lng)), urllib.quote(api_key), urllib.quote(date))
-        try:  
+        try:
           data = urllib.urlopen(url).read()
           dataopenweathermap = json.loads(data)
           rain = dataopenweathermap['data']['weather'][0]['precipMM']
-          return rain 
+          return rain
         except:
           return "no data"
 

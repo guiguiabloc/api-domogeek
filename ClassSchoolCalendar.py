@@ -11,9 +11,9 @@
 from __future__ import unicode_literals
 from urllib.request import urlopen
 from icalendar import Calendar, Event
-from datetime import datetime 
-from datetime import date 
-from icalendar import LocalTimezone   
+from datetime import datetime
+from datetime import date
+from icalendar import LocalTimezone
 import sys, time
 
 class schoolcalendar:
@@ -60,9 +60,9 @@ class schoolcalendar:
            yearend = enddecode[0]
            monthend = enddecode[1]
            dayend = enddecode[2]
-           listvalue.append([stringconvertstart, description,stringconvertend]) 
+           listvalue.append([stringconvertstart, description,stringconvertend])
         else:
-           listvalue.append([stringconvertstart, description]) 
+           listvalue.append([stringconvertstart, description])
      return str(listvalue)
 
   def isschoolcalendar(self,zone,day,month,year):
@@ -123,7 +123,7 @@ class schoolcalendar:
           if comparestart and compareend:
             description = startspring.encode('utf-8')
             return str(description)
-              
+
         if end:
            convertend = end.to_ical().decode("utf-8")
            enddecode = time.strptime(str(convertend), '%Y%m%d')

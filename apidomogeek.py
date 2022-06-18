@@ -140,7 +140,7 @@ class holiday:
         datenow = datetime.now()
         year = datenow.year
         month = datenow.month
-        day = datenow.day 
+        day = datenow.day
         result = dayrequest.estferie([day,month,year])
         if format == "json":
           web.header('Content-Type', 'application/json')
@@ -173,7 +173,7 @@ class holiday:
       if request[0] != "now" and request[0] != "all" and request[0] != "tomorrow":
         try:
           daterequest = request[0]
-          result = daterequest.split('-') 
+          result = daterequest.split('-')
         except:
           web.badrequest()
           return "Incorrect date format : D-M-YYYY\n"
@@ -352,7 +352,7 @@ class holidayall:
           return "no data available"
         web.header('Content-Type', 'application/json')
         return json.dumps({"holiday": resultholiday, "schoolholiday": resultschoolholidays, "weekend": resultweekend}, ensure_ascii=False).encode('utf8')
-      
+
       if request[1] != "now" and request[1] != "tomorrow":
         try:
           daterequest = request[1]
@@ -475,7 +475,7 @@ class tempoedf:
 @apiParam {String} [responsetype]  Specify Response Type (raw by default or specify json, only for single element).
 @apiSuccessExample Success-Response:
      HTTP/1.1 200 OK
-     Vacances de la Toussaint 
+     Vacances de la Toussaint
 
      HTTP/1.1 200 OK
      False
@@ -622,7 +622,7 @@ class schoolholiday:
 
 
 """
-@api {get} /vigilance/:department/:vigilancerequest/:responsetype Vigilance MeteoFrance 
+@api {get} /vigilance/:department/:vigilancerequest/:responsetype Vigilance MeteoFrance
 @apiName GetVigilance
 @apiGroup Domogeek
 @apiDescription Ask Vigilance MeteoFrance for :department
@@ -634,7 +634,7 @@ class schoolholiday:
      {"vigilanceflood": "jaune", "vigilancecolor": "orange", "vigilancerisk": "orages"}
 
      HTTP/1.1 200 OK
-     vert 
+     vert
 
 @apiErrorExample Error-Response:
      HTTP/1.1 400 Bad Request
@@ -670,7 +670,7 @@ class vigilance:
       if len(dep) > 2:
         web.badrequest()
         return "Incorrect request : /vigilance/{department number}/{color|risk|flood|all}\n"
-      if vigilancequery not in ["color","risk","flood", "all"]: 
+      if vigilancequery not in ["color","risk","flood", "all"]:
         web.badrequest()
         return "Incorrect request : /vigilance/{department}/{color|risk|flood|all}\n"
       if dep == "92" or dep == "93" or dep == "94":
@@ -725,7 +725,7 @@ class vigilance:
 
 
 """
-@api {get} /geolocation/:city City Geolocation 
+@api {get} /geolocation/:city City Geolocation
 @apiName GetGeolocation
 @apiGroup Domogeek
 @apiDescription Ask geolocation (latitude/longitude) :city
@@ -829,7 +829,7 @@ class geolocation:
          return "NO GEOLOCATION DATA AVAILABLE\n"
 
 """
-@api {get} /sun/:city/:sunrequest/:date/:responsetype Sun Status Request 
+@api {get} /sun/:city/:sunrequest/:date/:responsetype Sun Status Request
 @apiName GetSun
 @apiGroup Domogeek
 @apiDescription Ask to know sunrise, sunset, zenith, day duration for :date in :city (France)
@@ -1082,7 +1082,7 @@ class weather:
                return todayweather
         else:
             return todayweather
- 
+
       if request[2] == "tomorrow":
         tomorrowweather = weatherrequest.tomorrowopenweathermap(latitude, longitude, weatherrequestelement)
         datenow = datetime.now()
@@ -1170,7 +1170,7 @@ class myip:
 @api {get} /season/:responsetype Display Current Season
 @apiName GetSeason
 @apiGroup Domogeek
-@apiDescription Display current season 
+@apiDescription Display current season
 @apiParam {String} [responsetype]  Specify Response Type (raw by default or specify json, only for single element).
 @apiSuccessExample Success-Response:
      HTTP/1.1 200 OK
