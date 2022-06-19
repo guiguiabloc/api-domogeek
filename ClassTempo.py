@@ -6,7 +6,7 @@
 # http://api.domogeek.fr
 #
 
-import urllib2
+import urllib3
 import sys
 import json
 import datetime
@@ -17,7 +17,7 @@ class EDFTempo:
     now = datetime.datetime.now()
     today= now.strftime("%Y-%m-%d")
     try:
-      page = urllib2.urlopen('https://particulier.edf.fr/bin/edf_rc/servlets/ejptemponew?Date_a_remonter='+today+'&TypeAlerte=TEMPO')
+      page = urllib3.urlopen('https://particulier.edf.fr/bin/edf_rc/servlets/ejptemponew?Date_a_remonter='+today+'&TypeAlerte=TEMPO')
     except:
       return None
     response = json.load(page)
@@ -29,7 +29,7 @@ class EDFTempo:
     datetomorrow = now + timedelta(days=1)
     tomorrow = datetomorrow.strftime("%Y-%m-%d")
     try:
-      page = urllib2.urlopen('https://particulier.edf.fr/bin/edf_rc/servlets/ejptemponew?Date_a_remonter='+tomorrow+'&TypeAlerte=TEMPO')
+      page = urllib3.urlopen('https://particulier.edf.fr/bin/edf_rc/servlets/ejptemponew?Date_a_remonter='+tomorrow+'&TypeAlerte=TEMPO')
     except:
       return None
     response = json.load(page)

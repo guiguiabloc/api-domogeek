@@ -39,7 +39,7 @@ class sunriseClass:
 		return int(n)
 	def getEoT(self,j):
 		j=float(j)
-		m = 357.0+(0.9856*j) 
+		m = 357.0+(0.9856*j)
 		c = (1.914*sin(radians(m))) + (0.02*sin(radians(2.0*m)))
 		l = 280.0 + c + (0.9856*j)
 		r=(-2.465*sin(radians(2.0*l))) + (0.053*sin(radians(4.0*l)))
@@ -47,7 +47,7 @@ class sunriseClass:
 		return Equ/60.0
 	def getDec(self,j):
 		j=float(j)
-		m = 357.0+(0.9856*j) 
+		m = 357.0+(0.9856*j)
 		c = (1.914*sin(radians(m))) + (0.02*sin(radians(2.0*m)))
 		l = 280.0 + c + (0.9856*j)
 		sinDec= 0.3978*sin(radians(l))
@@ -68,9 +68,9 @@ class sunriseClass:
 	def getHM(self,nH):
 		h=int(nH)
 		m=int(((nH*60.0)%60)+0.5)
-                if m == 60 :
-                   m = 00
-                   h = h + 1
+		if m == 60 :
+				m = 00
+				h = h + 1
 		return '%d:%02d' % (h,m)
 	def calculateWithUTC(self,UTC):
 		mLon=(self.longitude*4.0)/60.0

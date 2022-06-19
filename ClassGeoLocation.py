@@ -6,7 +6,7 @@
 # http://api.domogeek.fr
 #
 
-import urllib,urllib2
+import urllib,urllib3
 from xml.dom.minidom import parseString
 import json
 
@@ -31,7 +31,7 @@ class geolocation:
   def geobing(self, addr, api_key):
        url = "http://dev.virtualearth.net/REST/v1/Locations?q=%s&key=%s" % (urllib.quote(addr), urllib.quote(api_key))
        try:
-         data = urllib2.urlopen(url).read()
+         data = urllib3.urlopen(url).read()
          databing = json.loads(data)
        except:
          return False
@@ -43,11 +43,11 @@ class geolocation:
        latitude = coord[0][0]
        longitude = coord[0][1]
        return latitude,longitude
-  
+
   def geonames(self, addr, api_key):
        url = "http://api.geonames.org/search?q=%s&maxRows=1&username=%s" % (urllib.quote(addr), urllib.quote(api_key))
        try:
-         data = urllib2.urlopen(url).read()
+         data = urllib3.urlopen(url).read()
        except:
          return "Error"
        dom = parseString(data)
@@ -56,4 +56,4 @@ class geolocation:
        latitude=latTag.replace('<lat>','').replace('</lat>','')
        longitude=lngTag.replace('<lng>','').replace('</lng>','')
        return latitude,longitude
-        
+

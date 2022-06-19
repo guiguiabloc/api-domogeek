@@ -9,7 +9,7 @@
 import web, sys, time
 import json,hashlib,socket
 from datetime import datetime,date,timedelta
-import urllib, urllib2
+import urllib, urllib3
 from Daemon import Daemon
 from xml.dom.minidom import parseString
 import Holiday
@@ -39,8 +39,8 @@ ejprequest = ClassEJP.EDFejp()
 ##########
 
 listenip = "0.0.0.0"
-listenport = "80"
-localapiurl= "http://api.domogeek.fr"
+listenport = "8090"
+localapiurl= "http://localhost:8090"
 googleapikey = ''
 bingmapapikey = ''
 geonameskey = ''
@@ -59,7 +59,7 @@ redis_port =  6379
 try:
  import redis
 except:
-  print "No Redis module : https://pypi.python.org/pypi/redis/"
+  print ("No Redis module : https://pypi.python.org/pypi/redis/")
   sys.exit(1)
 
 rc= redis.Redis(host=redis_host, port=redis_port)
@@ -67,7 +67,7 @@ rc.set("test", "ok")
 rc.expire("test" ,10)
 value = rc.get("test")
 if value is None:
-  print "Could not connect to  Redis  " + redis_host + " port " + redis_port
+  print ("Could not connect to  Redis  " + redis_host + " port " + redis_port)
 
 
 web.config.debug = False
@@ -140,7 +140,7 @@ class holiday:
         datenow = datetime.now()
         year = datenow.year
         month = datenow.month
-        day = datenow.day 
+        day = datenow.day
         result = dayrequest.estferie([day,month,year])
         if format == "json":
           web.header('Content-Type', 'application/json')
@@ -173,7 +173,7 @@ class holiday:
       if request[0] != "now" and request[0] != "all" and request[0] != "tomorrow":
         try:
           daterequest = request[0]
-          result = daterequest.split('-') 
+          result = daterequest.split('-')
         except:
           web.badrequest()
           return "Incorrect date format : D-M-YYYY\n"
@@ -326,23 +326,25 @@ class holidayall:
         return "Incorrect request : /holidayall/{zone}/{now|tomorrow|date(D-M-YYYY)}\n"
       if request[1] == "now":
         try:
-          responseholiday = urllib2.urlopen(localapiurl+'/holiday/now')
-          responseschoolholiday = urllib2.urlopen(localapiurl+'/schoolholiday/'+zoneok+'/now')
-          responseweekend = urllib2.urlopen(localapiurl+'/weekend/now')
+          responseholiday = urllib.request.urlopen(localapiurl+'/holiday/now')
+          responseschoolholiday = urllib.request.urlopen(localapiurl+'/schoolholiday/'+zoneok+'/now')
+          responseweekend = urllib.request.urlopen(localapiurl+'/weekend/now')
           resultholiday = responseholiday.read()
           resultschoolholiday = responseschoolholiday.read()
           resultschoolholidays = resultschoolholiday.decode('utf-8')
           resultweekend = responseweekend.read()
         except:
-          return "no data available"
+          return (urllib.request.urlopen(localapiurl+'/schoolholiday/'+zoneok+'/now') + "no data available 1")
         web.header('Content-Type', 'application/json')
-        return json.dumps({"holiday": resultholiday, "schoolholiday": resultschoolholidays, "weekend": resultweekend}, ensure_ascii=False).encode('utf8')
+        return json.dumps({"holiday": resultholiday.decode('utf-8'), "schoolholiday": resultschoolholidays, "weekend": resultweekend.decode('utf-8')}, ensure_ascii=False).encode('utf8')
       if request[1] == "tomorrow":
         try:
-          responseholiday = urllib2.urlopen(localapiurl+'/holiday/tomorrow')
-          responseschoolholiday = urllib2.urlopen(localapiurl+'/schoolholiday/'+zoneok+'/tomorrow')
-          responseweekend = urllib2.urlopen(localapiurl+'/weekend/tomorrow')
+          responseholiday = urllib3.urlopen(localapiurl+'/holiday/tomorrow')
+          responseschoolholiday = urllib3.urlopen(localapiurl+'/schoolholiday/'+zoneok+'/tomorrow')
+          responseweekend = urllib3.urlopen(localapiurl+'/weekend/tomorrow')
+          print(responseholiday)
           resultholiday = responseholiday.read()
+          print(resultholiday)
           resultschoolholiday = responseschoolholiday.read()
           resultschoolholidays = resultschoolholiday.decode('utf-8')
           resultweekend = responseweekend.read()
@@ -350,7 +352,7 @@ class holidayall:
           return "no data available"
         web.header('Content-Type', 'application/json')
         return json.dumps({"holiday": resultholiday, "schoolholiday": resultschoolholidays, "weekend": resultweekend}, ensure_ascii=False).encode('utf8')
-      
+
       if request[1] != "now" and request[1] != "tomorrow":
         try:
           daterequest = request[1]
@@ -366,9 +368,9 @@ class holidayall:
           web.badrequest()
           return "Incorrect date format : D-M-YYYY\n"
         try:
-          responseholiday = urllib2.urlopen(localapiurl+'/holiday/'+daterequest)
-          responseschoolholiday = urllib2.urlopen(localapiurl+'/schoolholiday/'+zoneok+'/'+daterequest)
-          responseweekend = urllib2.urlopen(localapiurl+'/weekend/'+daterequest)
+          responseholiday = urllib3.urlopen(localapiurl+'/holiday/'+daterequest)
+          responseschoolholiday = urllib3.urlopen(localapiurl+'/schoolholiday/'+zoneok+'/'+daterequest)
+          responseweekend = urllib3.urlopen(localapiurl+'/weekend/'+daterequest)
           resultholiday = responseholiday.read()
           resultschoolholiday = responseschoolholiday.read()
           resultschoolholidays = resultschoolholiday.decode('utf-8')
@@ -426,10 +428,10 @@ class tempoedf:
             rediskeytemponow =  hashlib.md5("temponow").hexdigest()
             rc.set(rediskeytemponow, result, 1800)
             rc.expire(rediskeytemponow ,1800)
-            print "SET TEMPO NOW IN REDIS"
+            print ("SET TEMPO NOW IN REDIS")
           else:
             result = gettemponow
-            print "FOUND TEMPO NOW IN REDIS"
+            print ("FOUND TEMPO NOW IN REDIS")
         except:
             result = temporequest.TempoToday()
 
@@ -447,10 +449,10 @@ class tempoedf:
             rediskeytempotomorrow =  hashlib.md5("tempotomorrow").hexdigest()
             rc.set(rediskeytempotomorrow, result, 1800)
             rc.expire(rediskeytempotomorrow ,1800)
-            print "SET TEMPO TOMORROW IN REDIS"
+            print ("SET TEMPO TOMORROW IN REDIS")
           else:
             result = gettempotomorrow
-            print "FOUND TEMPO TOMORROW IN REDIS"
+            print ("FOUND TEMPO TOMORROW IN REDIS")
         except:
             result = temporequest.TempoTomorrow()
 
@@ -473,7 +475,7 @@ class tempoedf:
 @apiParam {String} [responsetype]  Specify Response Type (raw by default or specify json, only for single element).
 @apiSuccessExample Success-Response:
      HTTP/1.1 200 OK
-     Vacances de la Toussaint 
+     Vacances de la Toussaint
 
      HTTP/1.1 200 OK
      False
@@ -524,17 +526,17 @@ class schoolholiday:
 
       if daterequest == "now":
         try:
-          rediskeyschoolholidaynow =  hashlib.md5("schoolholidaynow"+zoneok).hexdigest()
+          rediskeyschoolholidaynow =  hashlib.md5(("schoolholidaynow"+zoneok).encode('utf-8')).hexdigest()
           getschoolholidaynow = rc.get(rediskeyschoolholidaynow)
           if getschoolholidaynow is None:
             result = school.isschoolcalendar(zoneok,day,month,year)
             rediskeyschoolholidaynow =  hashlib.md5("schoolholidaynow"+zoneok).hexdigest()
             rc.set(rediskeyschoolholidaynow, result, 1800)
             rc.expire(rediskeyschoolholidaynow ,1800)
-            print "SET SCHOOL HOLIDAY "+zoneok+ " NOW IN REDIS"
+            print ("SET SCHOOL HOLIDAY "+zoneok+ " NOW IN REDIS")
           else:
             result = getschoolholidaynow
-            print "FOUND SCHOOL HOLIDAY "+zoneok+" NOW IN REDIS"
+            print ("FOUND SCHOOL HOLIDAY "+zoneok+" NOW IN REDIS")
         except:
            result = school.isschoolcalendar(zoneok,day,month,year)
         if result == None or result == "None":
@@ -563,10 +565,10 @@ class schoolholiday:
             rediskeyschoolholidaytomorrow =  hashlib.md5("schoolholidaytomorrow"+zoneok).hexdigest()
             rc.set(rediskeyschoolholidaytomorrow, result, 1800)
             rc.expire(rediskeyschoolholidaytomorrow ,1800)
-            print "SET SCHOOL HOLIDAY "+zoneok+ " TOMORROW IN REDIS"
+            print ("SET SCHOOL HOLIDAY "+zoneok+ " TOMORROW IN REDIS")
           else:
             result = getschoolholidaytomorrow
-            print "FOUND SCHOOL HOLIDAY "+zoneok+" TOMORROW IN REDIS"
+            print ("FOUND SCHOOL HOLIDAY "+zoneok+" TOMORROW IN REDIS")
         except:
            result = school.isschoolcalendar(zoneok,daytomorrow,monthtomorrow,yeartomorrow)
         if result == None or result == "None":
@@ -620,7 +622,7 @@ class schoolholiday:
 
 
 """
-@api {get} /vigilance/:department/:vigilancerequest/:responsetype Vigilance MeteoFrance 
+@api {get} /vigilance/:department/:vigilancerequest/:responsetype Vigilance MeteoFrance
 @apiName GetVigilance
 @apiGroup Domogeek
 @apiDescription Ask Vigilance MeteoFrance for :department
@@ -632,7 +634,7 @@ class schoolholiday:
      {"vigilanceflood": "jaune", "vigilancecolor": "orange", "vigilancerisk": "orages"}
 
      HTTP/1.1 200 OK
-     vert 
+     vert
 
 @apiErrorExample Error-Response:
      HTTP/1.1 400 Bad Request
@@ -668,7 +670,7 @@ class vigilance:
       if len(dep) > 2:
         web.badrequest()
         return "Incorrect request : /vigilance/{department number}/{color|risk|flood|all}\n"
-      if vigilancequery not in ["color","risk","flood", "all"]: 
+      if vigilancequery not in ["color","risk","flood", "all"]:
         web.badrequest()
         return "Incorrect request : /vigilance/{department}/{color|risk|flood|all}\n"
       if dep == "92" or dep == "93" or dep == "94":
@@ -683,14 +685,14 @@ class vigilance:
           rediskeyvigilance =  hashlib.md5(dep+"vigilance").hexdigest()
           rc.set(rediskeyvigilance, result, 1800)
           rc.expire(rediskeyvigilance ,1800)
-          print "SET VIGILANCE "+dep+"  IN REDIS"
+          print ("SET VIGILANCE "+dep+"  IN REDIS")
         else:
           tr1 =  getvigilance.replace("(","")
           tr2 = tr1.replace(")","")
           tr3 = tr2.replace("'","")
           tr4 = tr3.replace(" ","")
           result = tr4.split(',')
-          print "FOUND VIGILANCE "+dep+"  IN REDIS"
+          print ("FOUND VIGILANCE "+dep+"  IN REDIS")
       except:
           result = vigilancerequest.getvigilance(dep)
 
@@ -723,7 +725,7 @@ class vigilance:
 
 
 """
-@api {get} /geolocation/:city City Geolocation 
+@api {get} /geolocation/:city City Geolocation
 @apiName GetGeolocation
 @apiGroup Domogeek
 @apiDescription Ask geolocation (latitude/longitude) :city
@@ -759,7 +761,7 @@ class geolocation:
         if getlocation is None:
           pass
         else:
-          print "FOUND LOCATION IN REDIS !!!"
+          print ("FOUND LOCATION IN REDIS !!!")
           inredis = "ok"
           tr1 =  getlocation.replace("(","")
           tr2 = tr1.replace(")","")
@@ -781,7 +783,7 @@ class geolocation:
           web.header('Content-Type', 'application/json')
           return json.dumps({"latitude": data[0], "longitude": data[1]})
         except:
-          print "NO VALUE FROM GOOGLE"
+          print ("NO VALUE FROM GOOGLE")
 
       if bingmapapikey == '' or inredis == "ok":
         pass
@@ -792,10 +794,10 @@ class geolocation:
           try:
             data = geolocationrequest.geobing(city, bingmapapikey)
           except:
-            print "NO VALUE FROM BING"
+            print ("NO VALUE FROM BING")
             data = False
           if not data :
-            print "NO BING"
+            print ("NO BING")
           else:
             checkbing = True
             rediskey =  hashlib.md5(city).hexdigest()
@@ -812,10 +814,10 @@ class geolocation:
           try:
             data = geolocationrequest.geonames(city, geonameskey)
           except:
-            print "NO VALUE FROM GEONAMES"
+            print ("NO VALUE FROM GEONAMES")
             data = False
           if not data :
-            print "NO VALUE FROM GEONAMES"
+            print ("NO VALUE FROM GEONAMES")
           else:
             checkgeonames = True
             rediskey =  hashlib.md5(city).hexdigest()
@@ -827,7 +829,7 @@ class geolocation:
          return "NO GEOLOCATION DATA AVAILABLE\n"
 
 """
-@api {get} /sun/:city/:sunrequest/:date/:responsetype Sun Status Request 
+@api {get} /sun/:city/:sunrequest/:date/:responsetype Sun Status Request
 @apiName GetSun
 @apiGroup Domogeek
 @apiDescription Ask to know sunrise, sunset, zenith, day duration for :date in :city (France)
@@ -868,7 +870,7 @@ class dawndusk:
           web.badrequest()
           return "Incorrect request : /sun/city/{sunrise|sunset|zenith|dayduration|all}/{now|tomorrow}\n"
       try:
-        print str(city)
+        print (str(city))
       except UnicodeEncodeError:
         web.badrequest()
         return "Incorrect city format : /sun/city/{sunrise|sunset|zenith|dayduration|all}/{now|tomorrow}\n"
@@ -892,13 +894,13 @@ class dawndusk:
         rediskey =  hashlib.md5(city).hexdigest()
         getlocation = rc.get(rediskey)
         if getlocation is None:
-          print "NO KEY IN REDIS"
-          responsegeolocation = urllib2.urlopen(localapiurl+'/geolocation/'+city)
+          print ("NO KEY IN REDIS")
+          responsegeolocation = urllib3.urlopen(localapiurl+'/geolocation/'+city)
           resultgeolocation = json.load(responsegeolocation)
           latitude =  resultgeolocation["latitude"]
           longitude =  resultgeolocation["longitude"]
         else:
-          print "FOUND LOCATION IN REDIS !!!"
+          print ("FOUND LOCATION IN REDIS !!!")
           tr1 =  getlocation.replace("(","")
           tr2 = tr1.replace(")","")
           data = tr2.split(',')
@@ -1030,13 +1032,13 @@ class weather:
         rediskey =  hashlib.md5(city).hexdigest()
         getlocation = rc.get(rediskey)
         if getlocation is None:
-          print "NO KEY IN REDIS"
-          responsegeolocation = urllib2.urlopen(localapiurl+'/geolocation/'+city)
+          print ("NO KEY IN REDIS")
+          responsegeolocation = urllib3.urlopen(localapiurl+'/geolocation/'+city)
           resultgeolocation = json.load(responsegeolocation)
           latitude =  resultgeolocation["latitude"]
           longitude =  resultgeolocation["longitude"]
         else:
-          print "FOUND LOCATION IN REDIS !!!"
+          print ("FOUND LOCATION IN REDIS !!!")
           tr1 =  getlocation.replace("(","")
           tr2 = tr1.replace(")","")
           data = tr2.split(',')
@@ -1056,10 +1058,10 @@ class weather:
             rediskeytodayrain = hashlib.md5(str(latitude)+str(longitude)+str(datetoday)).hexdigest()
             rc.set(rediskeytodayrain, todayrain)
             rc.expire(rediskeytodayrain, 3600)
-            print "SET RAIN IN REDIS"
+            print ("SET RAIN IN REDIS")
           else:
             todayrain = gettodayrain
-            print "FOUND RAIN IN REDIS"
+            print ("FOUND RAIN IN REDIS")
         except:
           todayrain = weatherrequest.getrain(latitude, longitude, worldweatheronlineapikey, datetoday)
         if weatherrequestelement != "all" or weatherrequestelement != "temperature" or weatherrequestelement != "weather":
@@ -1080,7 +1082,7 @@ class weather:
                return todayweather
         else:
             return todayweather
- 
+
       if request[2] == "tomorrow":
         tomorrowweather = weatherrequest.tomorrowopenweathermap(latitude, longitude, weatherrequestelement)
         datenow = datetime.now()
@@ -1094,10 +1096,10 @@ class weather:
             rediskeytomorrowrain = hashlib.md5(str(latitude)+str(longitude)+str(datetomorrow)).hexdigest()
             rc.set(rediskeytomorrowrain, tomorrowrain)
             rc.expire(rediskeytomorrowrain, 3600)
-            print "SET RAIN IN REDIS"
+            print ("SET RAIN IN REDIS")
           else:
             tomorrowrain = gettomorrowrain
-            print "FOUND RAIN IN REDIS"
+            print ("FOUND RAIN IN REDIS")
         except:
           tomorrowrain = weatherrequest.getrain(latitude, longitude, worldweatheronlineapikey, datetomorrow)
         if weatherrequestelement != "all" or weatherrequestelement != "temperature" or weatherrequestelement != "weather":
@@ -1145,7 +1147,7 @@ class myip:
       pass
     try:
       format = request[1]
-      print format
+      print (format)
     except:
       format = None
     ip = web.ctx.env.get('HTTP_X_FORWARDED_FOR', web.ctx.get('ip', ''))
@@ -1168,7 +1170,7 @@ class myip:
 @api {get} /season/:responsetype Display Current Season
 @apiName GetSeason
 @apiGroup Domogeek
-@apiDescription Display current season 
+@apiDescription Display current season
 @apiParam {String} [responsetype]  Specify Response Type (raw by default or specify json, only for single element).
 @apiSuccessExample Success-Response:
      HTTP/1.1 200 OK
@@ -1273,10 +1275,10 @@ class ejpedf:
             rediskeyejptoday =  hashlib.md5("ejptoday"+zoneok).hexdigest()
             rc.set(rediskeyejptoday, result)
             rc.expire(rediskeyejptoday, 1800)
-            print "SET EJP "+zoneok+" TODAY IN REDIS"
+            print ("SET EJP "+zoneok+" TODAY IN REDIS")
           else:
             result = getejptoday
-            print "FOUND EJP "+zoneok+ " TODAY IN REDIS"
+            print ("FOUND EJP "+zoneok+ " TODAY IN REDIS")
         except:
             result = ejprequest.EJPToday(zoneok)
 
@@ -1295,10 +1297,10 @@ class ejpedf:
             rediskeyejptomorrow =  hashlib.md5("ejptomorrow"+zoneok).hexdigest()
             rc.set(rediskeyejptomorrow, result)
             rc.expire(rediskeyejptomorrow, 1800)
-            print "SET EJP "+zoneok+" TOMORROW IN REDIS"
+            print ("SET EJP "+zoneok+" TOMORROW IN REDIS")
           else:
             result = getejptomorrow
-            print "FOUND EJP "+zoneok+ " TOMORROW IN REDIS"
+            print ("FOUND EJP "+zoneok+ " TOMORROW IN REDIS")
         except:
             result = ejprequest.EJPTomorrow(zoneok)
 
@@ -1428,10 +1430,10 @@ if __name__ == "__main__":
                         service.console()
 
                 else:
-                        print "Unknown command"
+                        print ("Unknown command")
                         sys.exit(2)
                 sys.exit(0)
         else:
-                print "usage: %s start|stop|restart|console" % sys.argv[0]
+                print ("usage: %s start|stop|restart|console" % sys.argv[0])
                 sys.exit(2)
 
